@@ -37,6 +37,11 @@ export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 // Reset Password Rules (Forgot Password Flow ke baad)
 export const resetPasswordSchema = z
   .object({
+    // <-- YEH OTP KI NAYI FIELD ADD KI HAI -->
+    otp: z
+      .string()
+      .length(6, "OTP must be exactly 6 digits")
+      .regex(/^\d+$/, "OTP must contain only numbers"),
     newPassword: z
       .string()
       .min(6, "New password must be at least 6 characters"),

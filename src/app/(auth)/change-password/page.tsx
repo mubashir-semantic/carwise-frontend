@@ -8,6 +8,10 @@ import {
   changePasswordSchema,
   type ChangePasswordFormValues,
 } from "@/utilities/validations";
+import { useRouter } from "next/navigation";
+import api from "@/services/api"; // <-- API import ki
+import { isAxiosError } from "axios"; // <-- Error handling ke liye
+import toast from "react-hot-toast";
 
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -18,24 +22,61 @@ import AuthLink from "@/components/AuthLink";
 
 export default function ChangePasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   // Hook Form Setup
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
   });
 
-  const onSubmit = (data: ChangePasswordFormValues) => {
+  const onSubmit = async (data: ChangePasswordFormValues) => {
     setIsLoading(true);
-    console.log("Change Password Data: ", data);
 
-    setTimeout(() => {
+    try {
+      // 1. LocalStorage se JWT token get karein
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        toast.error("You are not logged in. Please log in first.");
+        router.push("/login");
+        return;
+      }
+
+      // 2. Asli API Call for Change Password (Token headers mein bhej rahe hain)
+      const response = await api.post(
+        "/auth/change-password",
+        {
+          oldPassword: data.oldPassword,
+          newPassword: data.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // <-- Protected route ke liye zaroori
+          },
+        },
+      );
+
+      // 3. Success Toast & Form Reset
+      toast.success(response.data.message || "Password changed successfully!");
+      reset();
+
+      // Optional: Agar password change hone ke baad kisi khaas page par bhejna ho
+      // router.push("/password-success");
+    } catch (error) {
+      // 4. Error Handling (e.g. Incorrect old password)
+      const errorMessage = isAxiosError(error)
+        ? error.response?.data?.message
+        : "Failed to change password. Please try again.";
+
+      toast.error(errorMessage || "Failed to change password.");
+    } finally {
       setIsLoading(false);
-      alert("Password changed successfully!");
-    }, 2000);
+    }
   };
 
   return (

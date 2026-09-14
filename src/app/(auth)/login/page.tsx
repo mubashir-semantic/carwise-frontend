@@ -7,6 +7,10 @@ import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormValues } from "@/utilities/validations";
+import { useRouter } from "next/navigation";
+import api from "@/services/api";
+import { isAxiosError } from "axios";
+import toast from "react-hot-toast";
 
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -18,6 +22,7 @@ import AuthLink from "@/components/AuthLink";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   // Hook Form Setup
   const {
@@ -28,14 +33,34 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormValues) => {
+  // Login Form Submission Handler
+  const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
-    console.log("Form Data: ", data);
+    try {
+      // Login API call
+      const response = await api.post("/auth/login", {
+        email: data.email,
+        password: data.password,
+      });
 
-    setTimeout(() => {
+      // API se aane wale dono JWT Tokens (Access aur Refresh) LocalStorage mein save karein!
+      const accessToken = response.data.accessToken;
+      const refreshToken = response.data.refreshToken; // <-- Yeh line add ki
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken); // <-- Yeh line add ki
+
+      toast.success("Login Successful!");
+      router.push("/");
+    } catch (error) {
+      const errorMessage = isAxiosError(error)
+        ? error.response?.data?.message
+        : "Invalid email or password.";
+
+      toast.error(errorMessage || "Invalid email or password.");
+    } finally {
       setIsLoading(false);
-      alert("Validation successful!");
-    }, 2000);
+    }
   };
 
   return (

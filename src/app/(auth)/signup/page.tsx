@@ -6,9 +6,11 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-// Import the signup schema and form values type from the validations utility
 import { signupSchema, type SignupFormValues } from "@/utilities/validations";
+import { useRouter } from "next/navigation";
+import api from "@/services/api";
+import { isAxiosError } from "axios";
+import toast from "react-hot-toast"; // <-- Toast Import kiya
 
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -20,8 +22,8 @@ import AuthLink from "@/components/AuthLink";
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // Hook Form Setup
   const {
     register,
     handleSubmit,
@@ -30,15 +32,29 @@ export default function SignupPage() {
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = (data: SignupFormValues) => {
+  const onSubmit = async (data: SignupFormValues) => {
     setIsLoading(true);
-    console.log("Signup Data: ", data);
+    try {
+      await api.post("/auth/signup", {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        mobile: data.mobile,
+      });
 
-    // Backend API call simulate
-    setTimeout(() => {
+      // <-- Alert ki jagah Toast laga diya
+      toast.success("Signup Successful! Please check your email for the OTP.");
+      router.push(`/otp?email=${encodeURIComponent(data.email)}`);
+    } catch (error) {
+      const errorMessage = isAxiosError(error)
+        ? error.response?.data?.message
+        : "Signup failed. Please try again.";
+
+      // <-- Error Alert ki jagah bhi Toast laga diya
+      toast.error(errorMessage || "Signup failed. Please try again.");
+    } finally {
       setIsLoading(false);
-      alert("Signup validation successful!");
-    }, 2000);
+    }
   };
 
   return (
@@ -47,7 +63,6 @@ export default function SignupPage() {
 
       <main className="flex-grow flex items-center justify-center py-25">
         <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          {/* Left Side: Illustration Area */}
           <div className="flex justify-center items-center relative w-full py-10">
             <div className="absolute -top-3 -left-4 w-[400px] h-[400px] md:w-[450px] md:h-[450px] z-0">
               <Image
@@ -60,7 +75,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* Light Blue Circle Container */}
             <div className="w-[470px] h-[470px] bg-lightBlue rounded-full flex items-center justify-center relative z-10">
               <Image
                 src="/car-service-repair-illustration.png"
@@ -73,7 +87,6 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Right Side: Signup Form */}
           <div className="bg-white p-10 rounded-2xl shadow-sm w-full max-w-lg ml-auto">
             <h1 className="text-3xl font-bold text-black mb-2">
               Create an account
@@ -85,12 +98,13 @@ export default function SignupPage() {
             <form
               onSubmit={handleSubmit(onSubmit)}
               className="flex flex-col space-y-5"
+              autoComplete="off"
             >
-              {/* Username Input */}
               <div>
                 <Input
                   type="text"
                   placeholder="Username"
+                  autoComplete="off"
                   {...register("username")}
                 />
                 {errors.username && (
@@ -100,25 +114,11 @@ export default function SignupPage() {
                 )}
               </div>
 
-              {/* Email Input */}
-              <div>
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  {...register("email")}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Mobile Input */}
               <div>
                 <Input
                   type="tel"
                   placeholder="Mobile number"
+                  autoComplete="off"
                   {...register("mobile")}
                 />
                 {errors.mobile && (
@@ -128,11 +128,25 @@ export default function SignupPage() {
                 )}
               </div>
 
-              {/* Password Input */}
+              <div>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  autoComplete="new-email"
+                  {...register("email")}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
               <div>
                 <Input
                   type="password"
                   placeholder="Password"
+                  autoComplete="new-password"
                   {...register("password")}
                 />
                 {errors.password && (
@@ -142,11 +156,11 @@ export default function SignupPage() {
                 )}
               </div>
 
-              {/* Confirm Password Input */}
               <div>
                 <Input
                   type="password"
                   placeholder="Confirm Password"
+                  autoComplete="new-password"
                   {...register("confirmPassword")}
                 />
                 {errors.confirmPassword && (

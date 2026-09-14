@@ -8,6 +8,10 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordFormValues,
 } from "@/utilities/validations";
+import { useRouter } from "next/navigation"; // <-- Router import kiya
+import api from "@/services/api"; // <-- API service import ki
+import { isAxiosError } from "axios";
+import toast from "react-hot-toast";
 
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -18,24 +22,40 @@ import AuthLink from "@/components/AuthLink";
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter(); // <-- Router initialize kiya
 
-  // Hook Form Setup
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = (data: ForgotPasswordFormValues) => {
+  const onSubmit = async (data: ForgotPasswordFormValues) => {
     setIsLoading(true);
-    console.log("Forgot Password Data: ", data);
+    try {
+      // 1. Asli API Call for Forgot Password
+      const response = await api.post("/auth/forgot-password", {
+        email: data.email,
+      });
 
-    setTimeout(() => {
+      // 2. Success Toast
+      toast.success(response.data.message || "OTP sent to your email!");
+      reset();
+
+      // 3. Redirect to Reset Password page aur email URL mein pass kar di
+      router.push(`/reset-password?email=${encodeURIComponent(data.email)}`);
+    } catch (error) {
+      // 4. Error Handling
+      const errorMessage = isAxiosError(error)
+        ? error.response?.data?.message
+        : "Failed to send OTP. Please try again.";
+      toast.error(errorMessage || "Failed to send OTP. Please try again.");
+    } finally {
       setIsLoading(false);
-      alert("OTP sent to your email!");
-    }, 2000);
+    }
   };
 
   return (
@@ -44,9 +64,7 @@ export default function ForgotPasswordPage() {
 
       <main className="flex-grow flex items-center justify-center py-25">
         <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          {/* Left Side: Consistent Illustration Area */}
           <div className="flex justify-center items-center relative w-full py-10">
-            {/* top-4 add kiya taake orange shape upar se cut na ho */}
             <div className="absolute top-4 -left-4 w-[400px] h-[400px] md:w-[450px] md:h-[450px] z-0">
               <Image
                 src="/Vector.png"
@@ -69,7 +87,6 @@ export default function ForgotPasswordPage() {
             </div>
           </div>
 
-          {/* Right Side: Forgot Password Form Area */}
           <div className="bg-white p-10 rounded-2xl shadow-sm w-full max-w-lg ml-auto">
             <h1 className="text-3xl font-bold text-black mb-2">
               Forgot Password
