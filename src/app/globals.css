@@ -4,8 +4,11 @@
   --color-darkPurple: #29194a;
   --color-brandOrange: #ff9554;
   --color-lightBg: #f5f5f7;
+  --color-sidebarBg: #fafafa;
   --color-lightBlue: #e8f1ff;
   --color-white: #ffffff;
+  --color-lightOrange: #fff8f5;
+  --color-black: #000000;
 }
 
 body {
