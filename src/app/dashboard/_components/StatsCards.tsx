@@ -35,15 +35,18 @@ export default function StatsCards() {
           key={stat.id}
           className="bg-white px-3 py-2 rounded-[20px] flex items-center gap-4 border border-gray-300 shadow-sm hover:shadow-md transition-shadow"
         >
+          {/* Circular Image Wrapper */}
           <div className="relative w-[90px] h-[90px] flex-shrink-0">
             <Image
               src={stat.image}
               alt={stat.title}
               fill
               className="object-contain object-center"
-              sizes="90px" // <-- Yahan sizes add kar diya hai taake terminal warning khatam ho jaye
+              sizes="90px"
             />
           </div>
+
+          {/* Details Section */}
           <div className="flex flex-col justify-center">
             <span className="text-gray-500 text-[12px] font-medium">
               {stat.title}
@@ -52,11 +55,12 @@ export default function StatsCards() {
               {stat.value}
             </span>
 
+            {/* Footer with optional notification bell */}
             {stat.footerText && (
               <span className="text-[14px] text-gray-700 font-medium mt-2 flex items-center">
                 {stat.footerText}
                 {stat.hasBell && (
-                  <span className="ml-1.5 text-brandOrange text-sm">🔔</span>
+                  <span className="ml-1.5 text-[#ff904d] text-sm">🔔</span>
                 )}
               </span>
             )}

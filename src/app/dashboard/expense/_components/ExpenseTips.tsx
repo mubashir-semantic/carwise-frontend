@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function ExpenseTips() {
   return (
-    <div className="bg-[#FFF6ED] rounded-[24px] px-8 pt-10 pb-10 flex flex-col justify-between relative overflow-hidden border border-[#FEE8D6] shadow-sm h-full min-h-[460px]">
+    <div className="bg-[#FFF4E8] rounded-[24px] px-8 pt-10 pb-10 flex flex-col justify-between relative overflow-hidden h-full min-h-[460px]">
       <div className="absolute top-0 left-0 w-[120px] h-[120px] pointer-events-none z-0">
         <Image
           src="/Ellipse 152 (1).png"
@@ -13,7 +13,6 @@ export default function ExpenseTips() {
           priority
         />
       </div>
-
       {/* Top Section: Icon & Compact Title/Text */}
       <div className="relative z-10">
         <div className=" items-center gap-3 mb-5">
@@ -38,7 +37,6 @@ export default function ExpenseTips() {
           least. Loreum ipsum is dj wieh shhd loreum impsum .
         </p>
       </div>
-
       <div className="relative z-10 flex items-end justify-between mt-10">
         <button className="flex items-center gap-3.5 text-gray-900 font-bold text-[16px] hover:text-brandOrange transition-colors pb-1">
           <span>See more</span>

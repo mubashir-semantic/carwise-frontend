@@ -14,7 +14,7 @@ import {
 const menuItems = [
   { name: "Dashboard", icon: FiGrid, path: "/dashboard" },
   { name: "Expense history", icon: FiClock, path: "/dashboard/expense" },
-  { name: "Service history", icon: FiTool, path: "/dashboard/service" },
+  { name: "Service history", icon: FiTool, path: "/dashboard/service-history" },
   { name: "Inbox", icon: FiMessageSquare, path: "/dashboard/inbox" },
   { name: "Setting", icon: FiSettings, path: "/dashboard/settings" },
 ];
