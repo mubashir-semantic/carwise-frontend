@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import api from "@/services/api";
 import toast from "react-hot-toast";
-import AddServiceModal from "../_components/AddExpenseModal";
 
-// Define our tabs
 const tabs = ["In-progress", "Completed", "Pending"] as const;
 type TabType = (typeof tabs)[number];
 
@@ -13,38 +11,39 @@ interface ServiceItem {
   _id: string;
   title: string;
   serviceCenter: string;
-  cost: number;
+  cost?: number;
+  bookingType?: string;
   serviceDate: string;
   status: string;
   createdAt: string;
 }
 
 export default function ServiceHistoryPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("In-progress");
+  const [activeTab, setActiveTab] = useState<TabType>("Completed");
   const [serviceData, setServiceData] = useState<ServiceItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  // Fetch data cleanly without triggering cascading re-render warnings
-  useEffect(() => {
-    const fetchServiceHistory = async () => {
-      try {
-        const response = await api.get("/service-history");
-        setServiceData(response.data);
-      } catch (error) {
-        console.error("Error fetching service history:", error);
-        toast.error("Failed to load service history records.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchServiceHistory();
+  const fetchServiceHistory = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get("/service-history");
+      setServiceData(response.data || []);
+    } catch (error) {
+      console.error("Error fetching service history:", error);
+      toast.error("Failed to load service history records.");
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchServiceHistory();
+  }, [fetchServiceHistory]);
+
   const filteredData = serviceData.filter((item) => {
-    const itemStatus = item.status.toLowerCase();
-    const currentTab = activeTab.toLowerCase();
+    const itemStatus = (item.status || "").toLowerCase().trim();
+    const currentTab = activeTab.toLowerCase().trim();
 
     if (currentTab === "in-progress") {
       return itemStatus === "in-progress" || itemStatus === "ongoing";
@@ -52,63 +51,86 @@ export default function ServiceHistoryPage() {
     return itemStatus === currentTab;
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return "bg-[#34d399] text-white";
-      case "in-progress":
-      case "ongoing":
-        return "bg-[#ff904d] text-white";
-      case "pending":
-        return "bg-gray-400 text-white";
-      default:
-        return "bg-gray-200 text-gray-700";
+  const formatMainDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    } catch {
+      return dateStr;
     }
   };
 
+  const formatCreatedDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "";
+      return `Created ${d.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      })}`;
+    } catch {
+      return "";
+    }
+  };
+
+  const getStatusBadgeClass = (status: string) => {
+    const s = (status || "").toLowerCase().trim();
+    if (s === "completed") return "bg-success text-white";
+    if (s === "in-progress" || s === "ongoing") return "bg-primary text-white";
+    if (s === "pending") return "bg-warning text-white";
+    return "bg-surface-subtle text-text-secondary";
+  };
+
   return (
-    <div className="flex flex-col w-full pb-10">
-      {/* Header with Tabs and Add Button */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-200 mb-8 pt-2 pb-4 gap-4">
-        {/* Tabs Header */}
-        <div className="flex items-center gap-8">
+    <div className="flex flex-col w-full px-2 sm:px-4 lg:px-6 pt-2 pb-20">
+      {/* Tabs Header with Full-Width Grey Border Line */}
+      <div className="w-full border-b border-border-main mb-8">
+        <div className="flex items-center gap-10 sm:gap-12">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-2 text-[16px] transition-colors relative font-medium ${
+              className={`relative pb-3 text-[15px] sm:text-[16px] transition-colors cursor-pointer ${
                 activeTab === tab
-                  ? "text-gray-900"
-                  : "text-gray-500 hover:text-gray-800"
+                  ? "text-text-heading font-medium"
+                  : "text-text-muted font-normal hover:text-text-main"
               }`}
             >
               {tab}
               {activeTab === tab && (
-                <span className="absolute bottom-[-17px] left-0 w-full h-[2px] bg-[#ff904d]" />
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-primary rounded-full -mb-[1.5px]" />
               )}
             </button>
           ))}
         </div>
-
-        {/* Add Service Button */}
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-[#ff904d] hover:bg-[#e67e3d] text-white text-sm font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-2"
-        >
-          <span>+ Add Service</span>
-        </button>
       </div>
 
-      {/* Table Container */}
+      {/* Table View */}
       <div className="w-full overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[900px]">
+        <table className="w-full text-left border-collapse min-w-[780px]">
           <thead>
-            <tr className="text-[#9ca3af] text-[11px] font-normal uppercase tracking-wider border-b border-gray-100">
-              <th className="pb-6 pt-2 w-[25%]">License - problem</th>
-              <th className="pb-6 pt-2 w-[20%]">Workshop name</th>
-              <th className="pb-6 pt-2 w-[20%]">Booking type</th>
-              <th className="pb-6 pt-2 w-[20%]">Date</th>
-              <th className="pb-6 pt-2 w-[15%]">Status</th>
+            <tr className="border-b border-border-subtle">
+              <th className="pb-4 font-normal text-[12px] text-text-muted w-[28%]">
+                License - problem
+              </th>
+              <th className="pb-4 font-normal text-[12px] text-text-muted w-[22%]">
+                Workshop name
+              </th>
+              <th className="pb-4 font-normal text-[12px] text-text-muted w-[20%]">
+                Booking type
+              </th>
+              <th className="pb-4 font-normal text-[12px] text-text-muted w-[18%]">
+                Date
+              </th>
+              <th className="pb-4 font-normal text-[12px] text-text-muted w-[12%]">
+                Status
+              </th>
             </tr>
           </thead>
 
@@ -117,81 +139,85 @@ export default function ServiceHistoryPage() {
               <tr>
                 <td
                   colSpan={5}
-                  className="py-12 text-center text-gray-400 text-sm animate-pulse"
+                  className="py-16 text-center text-text-muted text-sm animate-pulse"
                 >
-                  Loading service records from database...
+                  Loading service records...
                 </td>
               </tr>
-            ) : filteredData.length > 0 ? (
+            ) : filteredData.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="py-16 text-center text-text-muted text-sm"
+                >
+                  No dynamic records found in {activeTab}.
+                </td>
+              </tr>
+            ) : (
               filteredData.map((item) => (
                 <tr
                   key={item._id}
-                  className="border-b border-gray-50 last:border-none"
+                  className="border-b border-border-subtle last:border-none hover:bg-surface-subtle/50 transition-colors"
                 >
-                  <td className="py-6 text-[13px] text-gray-800 font-medium">
-                    {item.title}
+                  {/* Column 1: License - problem */}
+                  <td className="py-4 sm:py-5 text-[13px] text-text-main font-medium">
+                    {item.title?.startsWith("#")
+                      ? item.title
+                      : `#42424 - ${item.title}`}
                   </td>
-                  <td className="py-6">
+
+                  {/* Column 2: Workshop name */}
+                  <td className="py-4 sm:py-5">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-5 h-5 rounded-full bg-[#d32f2f] text-white flex items-center justify-center font-bold text-[10px]">
+                      <div className="w-[22px] h-[22px] rounded-full bg-error text-white flex items-center justify-center font-bold text-[10px] shrink-0 shadow-xs">
                         T
                       </div>
-                      <span className="text-[13px] text-gray-800 font-medium">
-                        {item.serviceCenter}
+                      <span className="text-[13px] text-text-main font-medium truncate">
+                        {item.serviceCenter || "Bildialog Asane"}
                       </span>
                     </div>
                   </td>
-                  <td className="py-6 text-[13px] text-gray-800 font-medium flex items-center gap-2 mt-2">
-                    <span className="w-[5px] h-[5px] rounded-full bg-[#1a103c]"></span>
-                    Rs. {item.cost}
+
+                  {/* Column 3: Booking type */}
+                  <td className="py-4 sm:py-5">
+                    <div className="flex items-center gap-2 text-[13px] text-text-main font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0"></span>
+                      <span>
+                        {item.bookingType || `Rs. ${item.cost || 4500}`}
+                      </span>
+                    </div>
                   </td>
-                  <td className="py-6">
+
+                  {/* Column 4: Date */}
+                  <td className="py-4 sm:py-5">
                     <div className="flex flex-col">
-                      <span className="text-[13px] text-gray-800 font-medium">
-                        {item.serviceDate}
+                      <span className="text-[13px] text-text-main font-medium leading-tight">
+                        {formatMainDate(item.serviceDate)}
                       </span>
-                      <span className="text-[11px] text-gray-400 mt-0.5">
-                        Added: {new Date(item.createdAt).toLocaleDateString()}
-                      </span>
+                      {item.createdAt && (
+                        <span className="text-[11px] text-text-muted mt-1 font-normal">
+                          {formatCreatedDate(item.createdAt)}
+                        </span>
+                      )}
                     </div>
                   </td>
-                  <td className="py-6">
+
+                  {/* Column 5: Status Badge */}
+                  <td className="py-4 sm:py-5">
                     <span
-                      className={`px-3 py-1.5 rounded-[4px] text-[11px] font-semibold tracking-wide ${getStatusColor(item.status)}`}
+                      className={`inline-block px-3 py-1 rounded-[5px] text-[11px] font-medium tracking-wide shadow-xs capitalize ${getStatusBadgeClass(
+                        item.status,
+                      )}`}
                     >
                       {item.status}
                     </span>
                   </td>
                 </tr>
               ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="py-12 text-center text-gray-400 text-sm"
-                >
-                  No records found in this category.
-                </td>
-              </tr>
             )}
           </tbody>
         </table>
       </div>
-
-      {/* Modal Component */}
-      <AddServiceModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={async () => {
-          // Re-fetch data on success
-          try {
-            const response = await api.get("/service-history");
-            setServiceData(response.data);
-          } catch (error) {
-            console.error("Error refreshing data:", error);
-          }
-        }}
-      />
     </div>
   );
 }

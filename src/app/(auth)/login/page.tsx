@@ -24,7 +24,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Hook Form Setup
   const {
     register,
     handleSubmit,
@@ -33,25 +32,22 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  // Login Form Submission Handler
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      // Login API call
       const response = await api.post("/auth/login", {
         email: data.email,
         password: data.password,
       });
 
-      // API se aane wale dono JWT Tokens (Access aur Refresh) LocalStorage mein save karein!
       const accessToken = response.data.accessToken;
-      const refreshToken = response.data.refreshToken; // <-- Yeh line add ki
+      const refreshToken = response.data.refreshToken;
 
       localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken); // <-- Yeh line add ki
+      localStorage.setItem("refreshToken", refreshToken);
 
       toast.success("Login Successful!");
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       const errorMessage = isAxiosError(error)
         ? error.response?.data?.message
@@ -64,61 +60,67 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-surface-subtle text-text-main">
       <Header />
-      <main className="flex-grow flex items-center justify-center py-25">
-        <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+
+      {/* Main page background: Soft Off-White (#F8FAFC) */}
+      <main className="grow flex items-center justify-center py-12 sm:py-16 lg:py-20 bg-surface-subtle">
+        <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 items-center">
           {/* Left Side: Illustration Area */}
-          <div className="flex justify-center items-center relative w-full py-10">
-            <div className="absolute -top-3 -left-4 w-[400px] h-[400px] md:w-[450px] md:h-[450px] z-0">
+          <div className="flex justify-center items-center relative w-full py-6">
+            {/* Background Orange Blob */}
+            <div className="absolute -top-4 -left-4 w-[380px] h-[380px] md:w-[450px] md:h-[450px] z-0 pointer-events-none">
               <Image
                 src="/Vector.png"
                 alt="Background Design"
                 fill
-                sizes="(max-width: 768px) 400px, 450px"
+                sizes="(max-width: 768px) 380px, 450px"
                 className="object-contain"
                 priority
               />
             </div>
 
-            {/* Light Blue Circle Container */}
-            <div className="w-[470px] h-[470px] bg-lightBlue rounded-full flex items-center justify-center relative z-10">
+            {/* Light Blue Circle */}
+            <div className="w-[360px] h-[360px] sm:w-[430px] sm:h-[430px] bg-blue-tint rounded-full flex items-center justify-center relative z-10 overflow-hidden shadow-xs">
               <Image
                 src="/car-service-repair-illustration-2.png"
                 alt="Car Service Login"
-                width={360}
-                height={360}
-                className="object-contain z-20 mix-blend-multiply w-[360px] h-[360px]"
+                width={350}
+                height={350}
+                className="object-contain z-20 mix-blend-multiply w-[350px] h-[350px]"
                 priority
               />
             </div>
           </div>
 
-          {/* Right Side: Login Form */}
-          <div className="bg-white p-10 rounded-2xl shadow-sm w-full max-w-lg ml-auto">
-            <h1 className="text-3xl font-bold text-black mb-2">
+          {/* Right Side: Pure White Login Card with Shadow */}
+          <div className="bg-surface border border-border-main/60 p-8 sm:p-10 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.05)] w-full max-w-lg mx-auto md:ml-auto">
+            <h1 className="text-3xl font-bold text-text-heading mb-2">
               Welcome back!
             </h1>
-            <p className="text-gray-500 mb-8 text-sm">
+            <p className="text-text-secondary mb-7 text-sm">
               Welcome back! Please enter your details.
             </p>
 
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            {/* Social Logins */}
+            <div className="grid grid-cols-3 gap-3.5 mb-6">
               <SocialButton icon={<FcGoogle size={22} />} />
               <SocialButton
-                icon={<FaFacebook size={22} className="text-blue-600" />}
+                icon={<FaFacebook size={22} className="text-[#1877f2]" />}
               />
               <SocialButton
-                icon={<FaInstagram size={22} className="text-pink-600" />}
+                icon={<FaInstagram size={22} className="text-[#e4405f]" />}
               />
             </div>
 
+            {/* Divider */}
             <div className="flex items-center mb-6">
-              <hr className="flex-grow border-gray-200" />
-              <span className="px-3 text-gray-400 text-xs">or</span>
-              <hr className="flex-grow border-gray-200" />
+              <hr className="grow border-border-main" />
+              <span className="px-3 text-text-muted text-xs">or</span>
+              <hr className="grow border-border-main" />
             </div>
 
+            {/* Form */}
             <form
               onSubmit={handleSubmit(onSubmit)}
               className="flex flex-col space-y-5"
@@ -130,7 +132,7 @@ export default function LoginPage() {
                   {...register("email")}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.email.message}
                   </p>
                 )}
@@ -143,37 +145,43 @@ export default function LoginPage() {
                   {...register("password")}
                 />
                 {errors.password && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.password.message}
                   </p>
                 )}
               </div>
 
-              <div className="flex justify-between items-center text-sm pt-2">
-                <label className="flex items-center space-x-2 text-gray-600 cursor-pointer">
+              <div className="flex justify-between items-center text-sm pt-1">
+                <label className="flex items-center space-x-2 text-text-secondary cursor-pointer">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-brandOrange focus:ring-brandOrange"
+                    className="w-4 h-4 rounded border-border-main accent-primary cursor-pointer"
                   />
-                  <span>Remember me</span>
+                  <span className="text-[13px]">Remember me</span>
                 </label>
-                <AuthLink href="/forgot-password">Forgot Password</AuthLink>
+                <AuthLink
+                  href="/forgot-password"
+                  className="text-[13px] font-normal text-text-secondary hover:text-primary underline"
+                >
+                  Forgot Password
+                </AuthLink>
               </div>
 
-              <div className="pt-4">
+              <div className="pt-3">
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? "Logging in..." : "Log in"}
                 </Button>
               </div>
             </form>
 
-            <p className="text-center mt-8 text-sm text-gray-600">
-              Do not have an account?{" "}
+            <p className="text-center mt-7 text-[13px] text-text-secondary">
+              Don&apos;t have an account?{" "}
               <AuthLink href="/signup">Sign up for free</AuthLink>
             </p>
           </div>
         </Container>
       </main>
+
       <Footer />
     </div>
   );

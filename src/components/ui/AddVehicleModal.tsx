@@ -36,7 +36,6 @@ export default function AddVehicleModal({
     onClose();
   };
 
-  // Step 1: Validation before moving to confirmation
   const handleInitialSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (licenseNumber.trim().length < 3) {
@@ -46,7 +45,6 @@ export default function AddVehicleModal({
     setStep(2);
   };
 
-  // Step 2: Actual API Call to NestJS Backend
   const handleFinalSubmit = async () => {
     if (!isConfirmed) return;
 
@@ -65,7 +63,6 @@ export default function AddVehicleModal({
       }
     } catch (error) {
       console.error("Vehicle API Error:", error);
-
       if (axios.isAxiosError(error)) {
         const errorMessage =
           error.response?.data?.message ||
@@ -81,8 +78,9 @@ export default function AddVehicleModal({
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
-      <div className="flex flex-col items-center px-6 pt-8 pb-10 sm:px-10">
-        <div className="relative w-[220px] h-[140px] mb-10 pointer-events-none">
+      <div className="flex flex-col items-center px-6 pt-8 pb-10 sm:px-10 bg-surface rounded-[24px]">
+        {/* Car Illustration */}
+        <div className="relative w-[230px] h-[140px] mb-8 pointer-events-none">
           <Image
             src="/Group 20398.png"
             alt="Add Vehicle Illustration"
@@ -97,7 +95,7 @@ export default function AddVehicleModal({
             onSubmit={handleInitialSubmit}
             className="w-full flex flex-col items-center"
           >
-            <div className="w-full max-w-[320px] mb-10">
+            <div className="w-full max-w-[320px] mb-8">
               <FloatingInput
                 label="Type your license number"
                 value={licenseNumber}
@@ -108,7 +106,7 @@ export default function AddVehicleModal({
 
             <button
               type="submit"
-              className="bg-[#ff904d] hover:bg-[#e67e3d] text-white font-semibold py-2.5 px-14 rounded-[12px] transition-colors shadow-sm text-[15px] cursor-pointer"
+              className="bg-primary hover:opacity-90 text-white font-semibold py-2.5 px-14 rounded-[12px] transition-all shadow-xs text-[15px] cursor-pointer"
             >
               Submit
             </button>
@@ -117,24 +115,19 @@ export default function AddVehicleModal({
 
         {step === 2 && (
           <div className="w-full flex flex-col items-center animate-in fade-in zoom-in duration-300">
-            <div className="w-8 h-8 mb-2">
-              <svg
-                viewBox="0 0 100 100"
-                fill="#fdb385"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M43.5 12.5C65.5 -2.5 87.5 12.5 93.5 39.5C99.5 66.5 73.5 90.5 48.5 95.5C23.5 100.5 2.5 76.5 1.5 50.5C0.5 24.5 21.5 27.5 43.5 12.5Z" />
-              </svg>
+            {/* Soft Organic Center Accent */}
+            <div className="w-10 h-8 mb-3 bg-primary-tint rounded-full flex items-center justify-center">
+              <span className="w-4 h-4 bg-primary/40 rounded-full"></span>
             </div>
 
             {/* Editable Car Name & Model Year */}
-            <div className="w-full flex flex-col items-center mb-5 space-y-1">
+            <div className="w-full flex flex-col items-center mb-6 space-y-1">
               <input
                 type="text"
                 value={carName}
                 onChange={(e) => setCarName(e.target.value)}
                 placeholder="Car Name"
-                className="text-[#1a103c] text-xl font-bold text-center border-b border-dashed border-gray-300 hover:border-[#ff904d] focus:border-[#ff904d] focus:outline-none transition-colors px-2 py-0.5 max-w-[280px]"
+                className="text-text-heading text-xl font-bold text-center border-b border-dashed border-border-main hover:border-primary focus:border-primary focus:outline-none transition-colors px-2 py-0.5 max-w-[280px] bg-transparent"
                 title="Click to edit car name"
               />
               <input
@@ -142,16 +135,17 @@ export default function AddVehicleModal({
                 value={modelYear}
                 onChange={(e) => setModelYear(e.target.value)}
                 placeholder="Year"
-                className="text-[#1a103c] text-[15px] font-medium text-center border-b border-dashed border-gray-300 hover:border-[#ff904d] focus:border-[#ff904d] focus:outline-none transition-colors px-2 py-0.5 w-24"
+                className="text-text-secondary text-[15px] font-medium text-center border-b border-dashed border-border-main hover:border-primary focus:border-primary focus:outline-none transition-colors px-2 py-0.5 w-24 bg-transparent"
                 title="Click to edit model year"
               />
             </div>
 
-            <label className="flex items-center gap-3 cursor-pointer mb-6 group">
+            {/* Confirmation Checkbox */}
+            <label className="flex items-center gap-3 cursor-pointer mb-7 group">
               <div className="relative flex items-center justify-center">
                 <input
                   type="checkbox"
-                  className="peer appearance-none w-[18px] h-[18px] border-[1.5px] border-gray-300 rounded-[4px] checked:bg-[#ff904d] checked:border-[#ff904d] transition-colors cursor-pointer"
+                  className="peer appearance-none w-[18px] h-[18px] border-[1.5px] border-border-main rounded-[4px] checked:bg-primary checked:border-primary transition-colors cursor-pointer"
                   checked={isConfirmed}
                   onChange={(e) => setIsConfirmed(e.target.checked)}
                 />
@@ -167,22 +161,23 @@ export default function AddVehicleModal({
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </div>
-              <span className="text-gray-500 text-[13px] select-none group-hover:text-gray-700 transition-colors">
+              <span className="text-text-secondary text-[13px] select-none group-hover:text-text-main transition-colors">
                 Yes, This is my information. I am clarifying it.
               </span>
             </label>
 
+            {/* Final Submit Button */}
             <button
               onClick={handleFinalSubmit}
               disabled={!isConfirmed || isLoading}
-              className={`relative font-semibold py-2.5 px-12 rounded-[12px] transition-all text-[15px] flex items-center justify-center min-w-[140px] cursor-pointer ${
+              className={`font-semibold py-2.5 px-12 rounded-[12px] transition-all text-[15px] flex items-center justify-center min-w-[140px] cursor-pointer ${
                 isConfirmed && !isLoading
-                  ? "bg-[#ff904d] hover:bg-[#e67e3d] text-white shadow-sm"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                  ? "bg-primary hover:opacity-90 text-white shadow-xs"
+                  : "bg-surface-subtle text-text-muted cursor-not-allowed shadow-none border border-border-subtle"
               }`}
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-gray-400 border-t-white rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-text-muted border-t-white rounded-full animate-spin"></div>
               ) : (
                 "Yes, Add"
               )}

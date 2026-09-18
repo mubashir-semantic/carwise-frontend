@@ -8,7 +8,7 @@ interface AddExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  endpoint?: string; // e.g. "/expense-history" or "/service-history"
+  endpoint?: string;
   titleLabel?: string;
 }
 
@@ -63,24 +63,27 @@ export default function AddExpenseModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-[20px] w-full max-w-xl p-8 shadow-2xl relative animate-in fade-in zoom-in duration-200">
-        {/* Modal Header */}
-        <div className="flex justify-between items-center pb-6 border-b border-gray-100">
-          <h3 className="text-xl font-bold text-gray-900">{titleLabel}</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl font-light px-2 py-1 transition-colors"
-          >
-            &times;
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+      <div className="bg-surface border border-border-main rounded-[22px] w-full max-w-lg p-7 sm:p-9 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 text-text-muted hover:text-text-main text-2xl font-light leading-none transition-colors cursor-pointer"
+        >
+          &times;
+        </button>
+
+        {/* Centered Heading */}
+        <h3 className="text-[20px] sm:text-[22px] font-bold text-text-heading text-center mb-6">
+          {titleLabel}
+        </h3>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5 pt-6">
-          <div className="grid grid-cols-2 gap-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Row 1: Title & Cost */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[11px] font-medium uppercase text-gray-400 mb-1.5 tracking-wider">
+              <label className="block text-[13px] font-medium text-text-main mb-1.5">
                 Title
               </label>
               <input
@@ -90,12 +93,12 @@ export default function AddExpenseModal({
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-[10px] text-sm focus:outline-none focus:border-[#ff904d] text-gray-800"
+                className="w-full px-3.5 py-2.5 bg-surface border border-border-main rounded-[10px] text-[14px] text-text-main focus:outline-none focus:border-primary transition-colors"
                 placeholder="e.g. Fuel Refill"
               />
             </div>
             <div>
-              <label className="block text-[11px] font-medium uppercase text-gray-400 mb-1.5 tracking-wider">
+              <label className="block text-[13px] font-medium text-text-main mb-1.5">
                 Cost
               </label>
               <input
@@ -105,30 +108,32 @@ export default function AddExpenseModal({
                 onChange={(e) =>
                   setFormData({ ...formData, cost: e.target.value })
                 }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-[10px] text-sm focus:outline-none focus:border-[#ff904d] text-gray-800"
+                className="w-full px-3.5 py-2.5 bg-surface border border-border-main rounded-[10px] text-[14px] text-text-main focus:outline-none focus:border-primary transition-colors"
                 placeholder="e.g. 5000"
               />
             </div>
           </div>
 
+          {/* Row 2: Servicing Details */}
           <div>
-            <label className="block text-[11px] font-medium uppercase text-gray-400 mb-1.5 tracking-wider">
+            <label className="block text-[13px] font-medium text-text-main mb-1.5">
               Servicing details
             </label>
             <textarea
-              rows={4}
+              rows={3}
               required
               value={formData.servicingDetails}
               onChange={(e) =>
                 setFormData({ ...formData, servicingDetails: e.target.value })
               }
-              className="w-full px-4 py-3 border border-gray-200 rounded-[10px] text-sm focus:outline-none focus:border-[#ff904d] text-gray-800 resize-none"
+              className="w-full px-3.5 py-2.5 bg-surface border border-border-main rounded-[12px] text-[14px] text-text-main focus:outline-none focus:border-primary transition-colors resize-none"
               placeholder="Enter details..."
             />
           </div>
 
+          {/* Row 3: Category */}
           <div>
-            <label className="block text-[11px] font-medium uppercase text-gray-400 mb-1.5 tracking-wider">
+            <label className="block text-[13px] font-medium text-text-main mb-1.5">
               Category
             </label>
             <div className="relative">
@@ -137,29 +142,30 @@ export default function AddExpenseModal({
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value })
                 }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-[10px] text-sm focus:outline-none focus:border-[#ff904d] bg-white text-gray-800 appearance-none cursor-pointer"
+                className="w-full px-3.5 py-2.5 bg-surface border border-border-main rounded-[10px] text-[14px] text-text-main focus:outline-none focus:border-primary appearance-none cursor-pointer"
               >
                 <option value="General">General</option>
                 <option value="Fuel">Fuel</option>
                 <option value="Maintenance">Maintenance</option>
                 <option value="Repair">Repair Work</option>
               </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted text-xs">
                 ▼
               </div>
             </div>
           </div>
 
+          {/* Row 4: Dashed Upload Box */}
           <div>
-            <label className="relative flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-[12px] cursor-pointer bg-gray-50/50 hover:bg-gray-50 transition-colors">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
-                <p className="text-xs text-gray-500 font-medium">
+            <label className="relative flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-border-main rounded-[12px] cursor-pointer bg-surface-subtle hover:bg-surface-subtle/80 transition-colors">
+              <div className="flex flex-col items-center justify-center px-4 text-center">
+                <p className="text-[12px] text-text-secondary font-medium">
                   {fileName ? (
-                    <span className="text-[#ff904d] font-semibold">
+                    <span className="text-primary font-semibold">
                       {fileName}
                     </span>
                   ) : (
-                    "Click to browse or drag and drop your files"
+                    "Click here to upload your receipt / drag and drop"
                   )}
                 </p>
               </div>
@@ -171,11 +177,12 @@ export default function AddExpenseModal({
             </label>
           </div>
 
-          <div className="pt-2">
+          {/* Row 5: Centered Submit Button */}
+          <div className="pt-3 flex justify-center">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#ff904d] hover:bg-[#e67e3d] text-white text-sm font-semibold rounded-[10px] shadow-sm transition-colors disabled:opacity-50"
+              className="px-10 py-2.5 bg-primary hover:opacity-90 text-white text-[14px] font-semibold rounded-[10px] shadow-xs transition-opacity disabled:opacity-50 cursor-pointer min-w-[150px]"
             >
               {isSubmitting ? "Saving..." : "Save"}
             </button>

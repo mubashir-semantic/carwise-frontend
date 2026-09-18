@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import {
   FaEnvelope,
   FaMapMarkerAlt,
@@ -9,106 +10,141 @@ import Container from "@/components/Container";
 
 export default function Footer() {
   return (
-    <footer className="bg-darkPurple text-white w-full">
-      <Container className="pt-16 pb-6">
+    <footer className="bg-header-bg text-white w-full border-t border-border-main/20">
+      <Container className="pt-14 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-12">
+          {/* Brand Info */}
           <div className="md:col-span-5">
-            <div className="text-3xl text-brandOrange font-bold tracking-wide mb-2">
+            <div className="text-3xl text-primary font-bold tracking-wide mb-2">
               CarWise
             </div>
-            <p className="text-sm font-light text-gray-300 mb-8 max-w-sm leading-relaxed">
+            <p className="text-sm font-normal text-white/70 mb-7 max-w-sm leading-relaxed">
               Leverandør av maskiner og forbruksartikler til bedrifter som
               arbeider med Miljøsanering-og Asbestsanering.
             </p>
-            <div className="flex flex-col space-y-3 text-sm font-light text-gray-300">
+            <div className="flex flex-col space-y-3 text-sm font-normal text-white/80">
               <div className="flex items-center space-x-3">
-                <FaEnvelope size={16} />
+                <FaEnvelope size={15} className="text-primary" />
                 <span>bildialog@yahoocmail.com</span>
               </div>
               <div className="flex items-center space-x-3">
-                <FaMapMarkerAlt size={16} />
+                <FaMapMarkerAlt size={15} className="text-primary" />
                 <span>Bergen, Norway</span>
               </div>
             </div>
           </div>
 
+          {/* Pages Links */}
           <div className="md:col-span-3">
-            <h3 className="font-semibold text-lg mb-6">Pages</h3>
-            <ul className="flex flex-col space-y-4 text-sm font-light text-gray-300">
+            <h3 className="font-semibold text-[17px] mb-5 text-white">Pages</h3>
+            <ul className="flex flex-col space-y-3 text-sm text-white/70">
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link href="/" className="hover:text-primary transition-colors">
                   Front
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/menu"
+                  className="hover:text-primary transition-colors"
+                >
                   Menu
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/order"
+                  className="hover:text-primary transition-colors"
+                >
                   Order
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/about"
+                  className="hover:text-primary transition-colors"
+                >
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/contact"
+                  className="hover:text-primary transition-colors"
+                >
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
+          {/* Company Links */}
           <div className="md:col-span-4">
-            <h3 className="font-semibold text-lg mb-6">Company</h3>
-            <ul className="flex flex-col space-y-4 text-sm font-light text-gray-300">
+            <h3 className="font-semibold text-[17px] mb-5 text-white">
+              Company
+            </h3>
+            <ul className="flex flex-col space-y-3 text-sm text-white/70">
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/pricing"
+                  className="hover:text-primary transition-colors"
+                >
                   Pricing
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/security"
+                  className="hover:text-primary transition-colors"
+                >
                   Security
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/privacy"
+                  className="hover:text-primary transition-colors"
+                >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/terms"
+                  className="hover:text-primary transition-colors"
+                >
                   Term of use
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-brandOrange transition">
+                <Link
+                  href="/career"
+                  className="hover:text-primary transition-colors"
+                >
                   Career
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        <hr className="border-gray-600 mb-6" />
+        <hr className="border-white/10 mb-6" />
 
-        <div className="flex flex-col md:flex-row justify-between items-center text-sm font-light text-gray-400">
-          <p>© 2022 CarWise | Powered by CarWise</p>
-          <div className="flex space-x-4 mt-4 md:mt-0">
+        {/* Bottom Bar */}
+        <div className="flex flex-col md:flex-row justify-between items-center text-xs sm:text-sm text-white/60 gap-4">
+          <p>© 2026 CarWise | Powered by CarWise</p>
+          <div className="flex space-x-3.5">
             <a
               href="#"
-              className="w-8 h-8 rounded-full border border-gray-400 flex items-center justify-center hover:text-brandOrange hover:border-brandOrange transition"
+              aria-label="Facebook"
+              className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center hover:text-primary hover:border-primary transition-colors"
             >
               <FaFacebook size={14} />
             </a>
             <a
               href="#"
-              className="w-8 h-8 rounded-full border border-gray-400 flex items-center justify-center hover:text-brandOrange hover:border-brandOrange transition"
+              aria-label="Instagram"
+              className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center hover:text-primary hover:border-primary transition-colors"
             >
               <FaInstagram size={14} />
             </a>

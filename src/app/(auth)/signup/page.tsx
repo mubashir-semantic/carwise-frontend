@@ -10,7 +10,7 @@ import { signupSchema, type SignupFormValues } from "@/utilities/validations";
 import { useRouter } from "next/navigation";
 import api from "@/services/api";
 import { isAxiosError } from "axios";
-import toast from "react-hot-toast"; // <-- Toast Import kiya
+import toast from "react-hot-toast";
 
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -42,7 +42,6 @@ export default function SignupPage() {
         mobile: data.mobile,
       });
 
-      // <-- Alert ki jagah Toast laga diya
       toast.success("Signup Successful! Please check your email for the OTP.");
       router.push(`/otp?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
@@ -50,7 +49,6 @@ export default function SignupPage() {
         ? error.response?.data?.message
         : "Signup failed. Please try again.";
 
-      // <-- Error Alert ki jagah bhi Toast laga diya
       toast.error(errorMessage || "Signup failed. Please try again.");
     } finally {
       setIsLoading(false);
@@ -58,46 +56,51 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-surface-subtle text-text-main">
       <Header />
 
-      <main className="flex-grow flex items-center justify-center py-25">
-        <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          <div className="flex justify-center items-center relative w-full py-10">
-            <div className="absolute -top-3 -left-4 w-[400px] h-[400px] md:w-[450px] md:h-[450px] z-0">
+      {/* Main Container with Soft Background */}
+      <main className="grow flex items-center justify-center py-12 sm:py-16 lg:py-20 bg-surface-subtle">
+        <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 items-center">
+          {/* Left Side: Illustration Area */}
+          <div className="flex justify-center items-center relative w-full py-6">
+            {/* Background Blob */}
+            <div className="absolute -top-4 -left-4 w-[380px] h-[380px] md:w-[450px] md:h-[450px] z-0 pointer-events-none">
               <Image
                 src="/Vector.png"
                 alt="Background Design"
                 fill
-                sizes="(max-width: 768px) 400px, 450px"
+                sizes="(max-width: 768px) 380px, 450px"
                 className="object-contain"
                 priority
               />
             </div>
 
-            <div className="w-[470px] h-[470px] bg-lightBlue rounded-full flex items-center justify-center relative z-10">
+            {/* Light Blue Accent Circle */}
+            <div className="w-[360px] h-[360px] sm:w-[430px] sm:h-[430px] bg-blue-tint rounded-full flex items-center justify-center relative z-10 overflow-hidden shadow-xs">
               <Image
                 src="/car-service-repair-illustration.png"
                 alt="Car Service Illustration"
-                width={360}
-                height={360}
-                className="object-contain z-20 w-[360px] h-[360px]"
+                width={350}
+                height={350}
+                className="object-contain z-20 mix-blend-multiply w-[350px] h-[350px]"
                 priority
               />
             </div>
           </div>
 
-          <div className="bg-white p-10 rounded-2xl shadow-sm w-full max-w-lg ml-auto">
-            <h1 className="text-3xl font-bold text-black mb-2">
+          {/* Right Side: White Card with Shadow */}
+          <div className="bg-surface border border-border-main/60 p-8 sm:p-10 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.05)] w-full max-w-lg mx-auto md:ml-auto">
+            <h1 className="text-3xl font-bold text-text-heading mb-2">
               Create an account
             </h1>
-            <p className="text-gray-500 mb-8 text-sm">
+            <p className="text-text-secondary mb-7 text-sm">
               Lets get started with us.
             </p>
 
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col space-y-5"
+              className="flex flex-col space-y-4"
               autoComplete="off"
             >
               <div>
@@ -108,7 +111,7 @@ export default function SignupPage() {
                   {...register("username")}
                 />
                 {errors.username && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.username.message}
                   </p>
                 )}
@@ -122,7 +125,7 @@ export default function SignupPage() {
                   {...register("mobile")}
                 />
                 {errors.mobile && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.mobile.message}
                   </p>
                 )}
@@ -136,7 +139,7 @@ export default function SignupPage() {
                   {...register("email")}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.email.message}
                   </p>
                 )}
@@ -150,7 +153,7 @@ export default function SignupPage() {
                   {...register("password")}
                 />
                 {errors.password && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.password.message}
                   </p>
                 )}
@@ -164,36 +167,38 @@ export default function SignupPage() {
                   {...register("confirmPassword")}
                 />
                 {errors.confirmPassword && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.confirmPassword.message}
                   </p>
                 )}
               </div>
 
-              <div className="pt-2">
+              <div className="pt-3">
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? "Sending OTP..." : "Get OTP"}
                 </Button>
               </div>
             </form>
 
+            {/* Divider */}
             <div className="flex items-center my-6">
-              <hr className="flex-grow border-gray-200" />
-              <span className="px-3 text-gray-400 text-xs">or</span>
-              <hr className="flex-grow border-gray-200" />
+              <hr className="grow border-border-main" />
+              <span className="px-3 text-text-muted text-xs">or</span>
+              <hr className="grow border-border-main" />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            {/* Social Buttons */}
+            <div className="grid grid-cols-3 gap-3.5">
               <SocialButton icon={<FcGoogle size={22} />} />
               <SocialButton
-                icon={<FaFacebook size={22} className="text-blue-600" />}
+                icon={<FaFacebook size={22} className="text-[#1877f2]" />}
               />
               <SocialButton
-                icon={<FaInstagram size={22} className="text-pink-600" />}
+                icon={<FaInstagram size={22} className="text-[#e4405f]" />}
               />
             </div>
 
-            <p className="text-center mt-8 text-sm text-gray-600">
+            <p className="text-center mt-7 text-[13px] text-text-secondary">
               Already have an account? <AuthLink href="/login">Log in</AuthLink>
             </p>
           </div>

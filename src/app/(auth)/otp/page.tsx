@@ -8,7 +8,7 @@ import { otpSchema, type OtpFormValues } from "@/utilities/validations";
 import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/services/api";
 import { isAxiosError } from "axios";
-import toast from "react-hot-toast"; // <-- Toast Import kiya
+import toast from "react-hot-toast";
 
 import Button from "@/components/Button";
 import Header from "@/components/Header";
@@ -17,7 +17,6 @@ import Container from "@/components/Container";
 import OtpInput from "@/components/OtpInput";
 import AuthLink from "@/components/AuthLink";
 
-// 1. OTP Form Component (Jisme API Logic hai)
 function OTPForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -37,7 +36,6 @@ function OTPForm() {
     },
   });
 
-  // REAL API CALL FOR VERIFY OTP
   const onSubmit = async (data: OtpFormValues) => {
     setIsLoading(true);
     try {
@@ -47,7 +45,6 @@ function OTPForm() {
       });
 
       toast.success("OTP Verified Successfully! Please login.");
-      // YEH LINE AAPKO LOGIN PAR REDIRECT KAREGI
       router.push("/login");
     } catch (error) {
       const errorMessage = isAxiosError(error)
@@ -59,7 +56,6 @@ function OTPForm() {
     }
   };
 
-  // REAL API CALL FOR RESEND OTP
   const handleResend = async () => {
     if (!email) {
       toast.error("Email is missing. Please signup again.");
@@ -81,11 +77,13 @@ function OTPForm() {
   };
 
   return (
-    <div className="bg-white p-10 rounded-2xl shadow-sm w-full max-w-lg ml-auto">
-      <h1 className="text-3xl font-bold text-black mb-2">Verify your email</h1>
-      <p className="text-gray-500 mb-8 text-sm leading-relaxed">
+    <div className="bg-surface border border-border-main/60 p-8 sm:p-10 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.05)] w-full max-w-lg mx-auto md:ml-auto">
+      <h1 className="text-3xl font-bold text-text-heading mb-2">
+        Verify your email
+      </h1>
+      <p className="text-text-secondary mb-8 text-sm leading-relaxed">
         We have sent a 6-digit OTP to{" "}
-        <span className="font-semibold text-black">
+        <span className="font-semibold text-text-heading">
           {email || "your registered email address"}
         </span>
         . Please enter it below to verify your account.
@@ -105,26 +103,26 @@ function OTPForm() {
           />
 
           {errors.otp && (
-            <p className="text-red-500 text-xs mt-3 text-center">
+            <p className="text-error text-xs mt-3 text-center">
               {errors.otp.message}
             </p>
           )}
         </div>
 
-        <div className="pt-4">
+        <div className="pt-2">
           <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? "Verifying..." : "Verify OTP"}
           </Button>
         </div>
       </form>
 
-      <div className="mt-8 text-sm text-gray-600 text-center">
+      <div className="mt-8 text-sm text-text-secondary text-center">
         <p>Didn&apos;t receive the code?</p>
         <button
           type="button"
           onClick={handleResend}
           disabled={isResending}
-          className="mt-2 font-bold text-black hover:text-brandOrange transition-colors duration-200"
+          className="mt-2 font-bold text-text-heading hover:text-primary transition-colors duration-200 cursor-pointer disabled:opacity-60"
         >
           {isResending ? "Sending..." : "Resend OTP"}
         </button>
@@ -137,42 +135,42 @@ function OTPForm() {
   );
 }
 
-// 2. MAIN PAGE COMPONENT
 export default function OTPPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-surface-subtle text-text-main">
       <Header />
 
-      <main className="flex-grow flex items-center justify-center py-25">
-        <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      <main className="grow flex items-center justify-center py-12 sm:py-16 lg:py-20 bg-surface-subtle">
+        <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 items-center">
           {/* Left Side: Consistent Illustration Area */}
-          <div className="flex justify-center items-center relative w-full py-10">
-            <div className="absolute -top-3 -left-4 w-[400px] h-[400px] md:w-[450px] md:h-[450px] z-0">
+          <div className="flex justify-center items-center relative w-full py-6">
+            <div className="absolute -top-4 -left-4 w-[380px] h-[380px] md:w-[450px] md:h-[450px] z-0 pointer-events-none">
               <Image
                 src="/Vector.png"
                 alt="Background Design"
                 fill
-                sizes="(max-width: 768px) 400px, 450px"
+                sizes="(max-width: 768px) 380px, 450px"
                 className="object-contain"
                 priority
               />
             </div>
-            <div className="w-[470px] h-[470px] bg-lightBlue rounded-full flex items-center justify-center relative z-10">
+
+            <div className="w-[360px] h-[360px] sm:w-[430px] sm:h-[430px] bg-blue-tint rounded-full flex items-center justify-center relative z-10 overflow-hidden shadow-xs">
               <Image
                 src="/car-service-repair-illustration.png"
                 alt="Car Service Illustration"
-                width={360}
-                height={360}
-                className="object-contain z-20 w-[360px] h-[360px]"
+                width={350}
+                height={350}
+                className="object-contain z-20 mix-blend-multiply w-[350px] h-[350px]"
                 priority
               />
             </div>
           </div>
 
-          {/* Right Side: Suspense Boundary for useSearchParams */}
+          {/* Right Side: Suspense Boundary */}
           <Suspense
             fallback={
-              <div className="flex justify-center items-center w-full max-w-lg ml-auto h-64 text-gray-500">
+              <div className="flex justify-center items-center w-full max-w-lg ml-auto h-64 text-text-muted">
                 Loading form...
               </div>
             }

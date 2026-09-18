@@ -9,8 +9,8 @@ import {
   type ChangePasswordFormValues,
 } from "@/utilities/validations";
 import { useRouter } from "next/navigation";
-import api from "@/services/api"; // <-- API import ki
-import { isAxiosError } from "axios"; // <-- Error handling ke liye
+import api from "@/services/api";
+import { isAxiosError } from "axios";
 import toast from "react-hot-toast";
 
 import Input from "@/components/Input";
@@ -24,7 +24,6 @@ export default function ChangePasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Hook Form Setup
   const {
     register,
     handleSubmit,
@@ -38,7 +37,6 @@ export default function ChangePasswordPage() {
     setIsLoading(true);
 
     try {
-      // 1. LocalStorage se JWT token get karein
       const token = localStorage.getItem("accessToken");
 
       if (!token) {
@@ -47,7 +45,6 @@ export default function ChangePasswordPage() {
         return;
       }
 
-      // 2. Asli API Call for Change Password (Token headers mein bhej rahe hain)
       const response = await api.post(
         "/auth/change-password",
         {
@@ -56,19 +53,14 @@ export default function ChangePasswordPage() {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // <-- Protected route ke liye zaroori
+            Authorization: `Bearer ${token}`,
           },
         },
       );
 
-      // 3. Success Toast & Form Reset
-      toast.success(response.data.message || "Password changed successfully!");
+      toast.success(response.data?.message || "Password changed successfully!");
       reset();
-
-      // Optional: Agar password change hone ke baad kisi khaas page par bhejna ho
-      // router.push("/password-success");
     } catch (error) {
-      // 4. Error Handling (e.g. Incorrect old password)
       const errorMessage = isAxiosError(error)
         ? error.response?.data?.message
         : "Failed to change password. Please try again.";
@@ -80,41 +72,42 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-surface-subtle text-text-main">
       <Header />
 
-      <main className="flex-grow flex items-center justify-center py-25">
-        <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          {/* Left Side: Consistent Illustration Area */}
-          <div className="flex justify-center items-center relative w-full py-10">
-            <div className="absolute top-4 -left-4 w-[400px] h-[400px] md:w-[450px] md:h-[450px] z-0">
+      <main className="grow flex items-center justify-center py-12 sm:py-16 lg:py-20 bg-surface-subtle">
+        <Container className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 items-center">
+          {/* Left Side: Illustration Area */}
+          <div className="flex justify-center items-center relative w-full py-6">
+            <div className="absolute -top-4 -left-4 w-[380px] h-[380px] md:w-[450px] md:h-[450px] z-0 pointer-events-none">
               <Image
                 src="/Vector.png"
                 alt="Background Design"
                 fill
-                sizes="(max-width: 768px) 400px, 450px"
+                sizes="(max-width: 768px) 380px, 450px"
                 className="object-contain"
                 priority
               />
             </div>
-            <div className="w-[470px] h-[470px] bg-lightBlue rounded-full flex items-center justify-center relative z-10">
+
+            <div className="w-[360px] h-[360px] sm:w-[430px] sm:h-[430px] bg-blue-tint rounded-full flex items-center justify-center relative z-10 overflow-hidden shadow-xs">
               <Image
                 src="/car-service-repair-illustration.png"
                 alt="Car Service Illustration"
-                width={360}
-                height={360}
-                className="object-contain z-20 w-[360px] h-[360px]"
+                width={350}
+                height={350}
+                className="object-contain z-20 mix-blend-multiply w-[350px] h-[350px]"
                 priority
               />
             </div>
           </div>
 
-          {/* Right Side: Change Password Form Area */}
-          <div className="bg-white p-10 rounded-2xl shadow-sm w-full max-w-lg ml-auto">
-            <h1 className="text-3xl font-bold text-black mb-2">
+          {/* Right Side: Change Password Form Card */}
+          <div className="bg-surface border border-border-main/60 p-8 sm:p-10 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.05)] w-full max-w-lg mx-auto md:ml-auto">
+            <h1 className="text-3xl font-bold text-text-heading mb-2">
               Change Password
             </h1>
-            <p className="text-gray-500 mb-8 text-sm leading-relaxed">
+            <p className="text-text-secondary mb-8 text-sm leading-relaxed">
               Please enter your current password and a new secure password
               below.
             </p>
@@ -123,7 +116,6 @@ export default function ChangePasswordPage() {
               onSubmit={handleSubmit(onSubmit)}
               className="flex flex-col space-y-6"
             >
-              {/* Old Password */}
               <div>
                 <Input
                   type="password"
@@ -131,13 +123,12 @@ export default function ChangePasswordPage() {
                   {...register("oldPassword")}
                 />
                 {errors.oldPassword && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.oldPassword.message}
                   </p>
                 )}
               </div>
 
-              {/* New Password */}
               <div>
                 <Input
                   type="password"
@@ -145,13 +136,12 @@ export default function ChangePasswordPage() {
                   {...register("newPassword")}
                 />
                 {errors.newPassword && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.newPassword.message}
                   </p>
                 )}
               </div>
 
-              {/* Confirm New Password */}
               <div>
                 <Input
                   type="password"
@@ -159,7 +149,7 @@ export default function ChangePasswordPage() {
                   {...register("confirmNewPassword")}
                 />
                 {errors.confirmNewPassword && (
-                  <p className="text-red-500 text-xs mt-1.5 px-1">
+                  <p className="text-error text-xs mt-1.5 px-1">
                     {errors.confirmNewPassword.message}
                   </p>
                 )}

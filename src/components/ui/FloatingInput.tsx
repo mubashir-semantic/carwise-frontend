@@ -1,6 +1,5 @@
 import React from "react";
 
-// Professional Type Definition for Input Props
 interface FloatingInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
 }
@@ -11,12 +10,12 @@ export default function FloatingInput({ label, ...props }: FloatingInputProps) {
       {/* Actual Input Field */}
       <input
         {...props}
-        className="w-full border border-gray-300 rounded-[12px] px-4 py-3.5 text-gray-800 text-sm focus:outline-none focus:border-[#ff904d] focus:ring-1 focus:ring-[#ff904d] transition-colors peer"
-        placeholder=" " // Space is important for the floating CSS trick
+        className="w-full bg-surface border border-border-main rounded-[12px] px-4 py-3.5 text-text-main text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors peer"
+        placeholder=" "
       />
 
-      {/* Floating Label (Figma design ke mutabiq border ke upar) */}
-      <label className="absolute left-3 -top-2.5 bg-white px-1 text-xs text-gray-400 peer-focus:text-[#ff904d] transition-colors">
+      {/* Floating Label */}
+      <label className="absolute left-3 -top-2.5 bg-surface px-1.5 text-xs text-text-muted peer-focus:text-primary transition-colors pointer-events-none">
         {label}
       </label>
     </div>

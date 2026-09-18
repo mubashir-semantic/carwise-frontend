@@ -18,17 +18,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           type={inputType}
           {...props}
-          className={`border-b border-gray-200 pb-2 bg-transparent outline-none focus:border-brandOrange text-sm text-black placeholder-gray-700 w-full ${
+          className={`border-b border-border-main pb-2.5 bg-transparent outline-none focus:border-primary text-sm text-text-main placeholder:text-text-muted transition-colors w-full ${
             isPassword ? "pr-8" : ""
           } ${className || ""}`}
         />
 
-        {/* Eye Icon sirf tab nazar aayega jab input ka type password ho */}
         {isPassword && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-0 bottom-2 text-gray-400 hover:text-brandOrange focus:outline-none transition-colors"
+            className="absolute right-0 bottom-2.5 text-text-muted hover:text-primary focus:outline-none transition-colors cursor-pointer"
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
               <MdVisibilityOff size={18} />

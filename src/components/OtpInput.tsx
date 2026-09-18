@@ -22,22 +22,18 @@ export default function OtpInput({
     const val = e.target.value;
     if (!/^[0-9]*$/.test(val)) return;
 
-    // Existing value ko array mein convert karein
     const otpArray = value.split("").slice(0, length);
-    // User ne jo type kiya uska aakhri character lein
     otpArray[index] = val.substring(val.length - 1);
 
     const newOtp = otpArray.join("");
     onChange(newOtp);
 
-    // Agar value enter ho gayi hai to aglay box par focus karein
     if (val && index < length - 1 && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number) => {
-    // Agar box khali ho aur user Backspace dabaye to pichle box par jayen
     if (e.key === "Backspace" && !value[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -60,7 +56,7 @@ export default function OtpInput({
   const otpValues = Array.from({ length }, (_, i) => value[i] || "");
 
   return (
-    <div className="flex justify-between w-full gap-2">
+    <div className="flex justify-between w-full gap-2 sm:gap-3">
       {otpValues.map((v, index) => (
         <input
           key={index}
@@ -74,7 +70,7 @@ export default function OtpInput({
           onChange={(e) => handleChange(e, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
           onPaste={handlePaste}
-          className="w-12 h-14 sm:w-[3.5rem] sm:h-[4rem] border border-gray-200 rounded-xl text-center text-xl font-bold text-black outline-none focus:border-brandOrange focus:ring-1 focus:ring-brandOrange transition-all bg-transparent"
+          className="w-12 h-14 sm:w-[3.5rem] sm:h-[4rem] border border-border-main rounded-[12px] text-center text-xl font-bold text-text-heading outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-surface shadow-2xs"
         />
       ))}
     </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import api from "@/services/api";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function DashboardHeader() {
   const [userName, setUserName] = useState<string>("User");
@@ -12,8 +13,6 @@ export default function DashboardHeader() {
     const fetchUserProfile = async () => {
       try {
         const response = await api.get("/users/profile");
-        console.log("Full Profile Response:", response.data);
-
         const userData = response.data?.user || response.data;
 
         if (userData && userData.username) {
@@ -32,70 +31,63 @@ export default function DashboardHeader() {
   }, []);
 
   return (
-    <header className="bg-[#1a103c] text-white flex justify-between items-center px-8 lg:px-12 py-4 w-full">
+    <header className="bg-header-bg text-white flex justify-between items-center px-4 sm:px-8 lg:px-12 py-3.5 w-full sticky top-0 z-30 shadow-sm">
       {/* Left: Logo */}
       <Link
         href="/dashboard"
-        className="text-[#ff904d] text-3xl font-bold tracking-wide"
+        className="text-primary text-2xl sm:text-3xl font-bold tracking-wide shrink-0"
       >
         CarWise
       </Link>
 
       {/* Center: Navigation Links */}
-      <div className="hidden md:flex items-center gap-10 text-[15px] font-medium">
-        <Link href="/about" className="hover:text-[#ff904d] transition-colors">
+      <div className="hidden md:flex items-center gap-8 lg:gap-10 text-[15px] font-medium text-white/90">
+        <Link href="/about" className="hover:text-primary transition-colors">
           About Us
         </Link>
-        <Link
-          href="/contact"
-          className="hover:text-[#ff904d] transition-colors"
-        >
+        <Link href="/contact" className="hover:text-primary transition-colors">
           Contact Us
         </Link>
       </div>
 
-      {/* Right: Actions & User Info */}
-      <div className="flex items-center gap-8">
-        <button className="bg-[#ff904d] hover:bg-[#e67e3d] transition-colors text-white px-6 py-2.5 rounded-[8px] font-semibold text-[14px] shadow-sm">
+      {/* Right: Actions & Profile */}
+      <div className="flex items-center gap-3 sm:gap-6 lg:gap-8">
+        {/* Get The App Button */}
+        <button className="hidden sm:inline-flex bg-primary hover:opacity-90 transition-opacity text-white px-5 lg:px-6 py-2 rounded-lg font-semibold text-[13px] lg:text-[14px] shadow-sm whitespace-nowrap">
           Get The App
         </button>
 
-        {/* User Profile */}
-        <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200 border border-gray-600">
-            {/* Awesome Auto-Avatar Generator based on User Name */}
+        {/* User Info */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-surface-subtle border border-border-main shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`https://ui-avatars.com/api/?name=${userName}&background=ff904d&color=fff&bold=true`}
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                userName,
+              )}&background=f5924a&color=fff&bold=true`}
               alt="User Avatar"
               className="object-cover w-full h-full"
             />
           </div>
-          <span className="text-[15px] font-medium tracking-wide">
-            {isLoading ? (
-              <span className="animate-pulse text-gray-400">Loading...</span>
-            ) : (
-              `Hii, ${userName}`
-            )}
+          <span className="hidden sm:inline text-[14px] sm:text-[15px] font-medium tracking-wide text-white truncate max-w-[120px] md:max-w-none">
+            {isLoading ? "..." : `Hii, ${userName}`}
           </span>
         </div>
 
-        {/* Notification Bell (Pixel-perfect as per Figma) */}
-        <div className="relative cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center">
-          {/* Filled Orange Bell Icon */}
+        {/* Notification Bell */}
+        <div className="relative cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center p-1">
           <svg
             width="22"
             height="22"
             viewBox="0 0 24 24"
-            fill="#ff904d"
+            className="fill-primary"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" />
           </svg>
-
-          {/* Red Notification Dot */}
-          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-[#1a103c] translate-x-[2px] -translate-y-[2px]"></span>
+          <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-error rounded-full border-2 border-header-bg"></span>
         </div>
+        <ThemeToggle />
       </div>
     </header>
   );

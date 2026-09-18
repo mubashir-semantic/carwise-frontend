@@ -29,38 +29,37 @@ export default function StatsCards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 lg:gap-5 w-full">
       {stats.map((stat) => (
         <div
           key={stat.id}
-          className="bg-white px-3 py-2 rounded-[20px] flex items-center gap-4 border border-gray-300 shadow-sm hover:shadow-md transition-shadow"
+          className="bg-surface px-3.5 sm:px-4 py-3 rounded-[20px] flex items-center gap-3 sm:gap-4 border border-border-main shadow-xs hover:shadow-sm transition-shadow"
         >
           {/* Circular Image Wrapper */}
-          <div className="relative w-[90px] h-[90px] flex-shrink-0">
+          <div className="relative w-[70px] h-[70px] sm:w-[82px] sm:h-[82px] shrink-0">
             <Image
               src={stat.image}
               alt={stat.title}
               fill
               className="object-contain object-center"
-              sizes="90px"
+              sizes="(max-width: 640px) 70px, 82px"
             />
           </div>
 
           {/* Details Section */}
-          <div className="flex flex-col justify-center">
-            <span className="text-gray-500 text-[12px] font-medium">
+          <div className="flex flex-col justify-center min-w-0">
+            <span className="text-text-muted text-[11px] sm:text-[12px] font-medium truncate">
               {stat.title}
             </span>
-            <span className="text-gray-800 font-bold text-[20px] tracking-tight">
+            <span className="text-text-heading font-bold text-[18px] sm:text-[20px] tracking-tight mt-0.5">
               {stat.value}
             </span>
 
-            {/* Footer with optional notification bell */}
             {stat.footerText && (
-              <span className="text-[14px] text-gray-700 font-medium mt-2 flex items-center">
+              <span className="text-[12px] sm:text-[13px] text-text-secondary font-medium mt-1 flex items-center">
                 {stat.footerText}
                 {stat.hasBell && (
-                  <span className="ml-1.5 text-[#ff904d] text-sm">🔔</span>
+                  <span className="ml-1.5 text-primary text-xs">🔔</span>
                 )}
               </span>
             )}

@@ -14,7 +14,7 @@ export default function AuthLink({
   return (
     <Link
       {...props}
-      className={`font-semibold text-black hover:text-brandOrange underline transition-colors duration-200 ${className}`}
+      className={`font-semibold text-text-heading hover:text-primary underline underline-offset-4 transition-colors duration-200 cursor-pointer ${className}`}
     >
       {children}
     </Link>

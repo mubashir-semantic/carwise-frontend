@@ -5,16 +5,16 @@ import RightSidebar from "./_components/RightSidebar";
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col xl:flex-row gap-8 w-full h-full mt-4">
-      {/* 1. MIDDLE COLUMN (Main Content) */}
-      <div className="flex-1 flex flex-col space-y-6">
+    <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 w-full mt-2 sm:mt-4 min-w-0">
+      {/* 1. MIDDLE COLUMN */}
+      <div className="flex-1 min-w-0 flex flex-col space-y-6">
         <HeroBanner />
         <StatsCards />
         <CarStatus />
       </div>
 
-      {/* 2. RIGHT COLUMN (Widgets) */}
-      <div className="w-full xl:w-[320px] flex flex-col space-y-6">
+      {/* 2. RIGHT COLUMN */}
+      <div className="w-full xl:w-[320px] shrink-0 flex flex-col space-y-6">
         <RightSidebar />
       </div>
     </div>
