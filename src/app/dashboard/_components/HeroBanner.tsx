@@ -42,12 +42,16 @@ export default function HeroBanner() {
 
       {/* Right Side: Text & Button */}
       <div className="relative z-10 w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left mt-4 md:mt-0">
-        <h2 className="text-[26px] sm:text-[30px] font-bold text-text-heading mb-2 leading-tight">
+        {/* Fixed dark navy tone across both light and dark mode */}
+        <h2 className="text-[26px] sm:text-[30px] font-bold text-secondary mb-2 leading-tight">
           Easy Servicing Way
         </h2>
-        <p className="text-text-secondary text-[13px] sm:text-[14px] mb-5 sm:mb-6 max-w-[280px] leading-relaxed">
+
+        {/* Text readability maintained across themes */}
+        <p className="text-secondary/75 text-[13px] sm:text-[14px] mb-5 sm:mb-6 max-w-[280px] leading-relaxed">
           Find your most nearest workshop and book your car done by your phone.
         </p>
+
         <button className="bg-primary hover:bg-secondary text-white px-7 sm:px-8 py-2.5 rounded-[10px] text-xs sm:text-sm font-semibold transition-all shadow-sm cursor-pointer">
           Book Service
         </button>

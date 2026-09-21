@@ -27,7 +27,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="w-64 flex flex-col py-12 px-4 shrink-0 min-h-[calc(100vh-70px)] justify-between space-between bg-surface-subtle border-r border-border-main">
+    <div className="w-64 flex flex-col py-12 px-4 shrink-0 min-h-[calc(100vh-70px)] justify-between bg-surface-subtle border-r border-border-main transition-colors duration-200">
       {/* Navigation Links */}
       <nav className="space-y-1.5 w-full">
         {menuItems.map((item) => {
@@ -43,7 +43,7 @@ export default function Sidebar() {
               className={`flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 font-medium text-sm ${
                 isActive
                   ? "bg-secondary text-white shadow-sm"
-                  : "text-text-main hover:bg-surface-subtle hover:text-text-heading"
+                  : "text-text-main hover:bg-surface hover:text-text-heading"
               }`}
             >
               <item.icon
@@ -68,13 +68,21 @@ export default function Sidebar() {
             priority
           />
         </div>
-        <h4 className="text-[14px] font-bold text-text-heading mb-1">
+
+        {/* Heading: text-secondary dark mode mein bhi #1e1b4b rahega */}
+        <h4 className="text-[14px] font-bold text-secondary mb-1">
           Update to premium
         </h4>
-        <p className="text-[12px] text-text-secondary mb-4">
+
+        {/* Subtitle: text-secondary/70 clear visibility maintain karega */}
+        <p className="text-[12px] text-secondary/70 mb-4">
           and get 40% discount
         </p>
-        <button className="w-full bg-primary hover:opacity-90 text-white text-[12px] font-semibold py-2.5 rounded-lg transition-opacity shadow-sm">
+
+        <button
+          type="button"
+          className="w-full bg-primary hover:opacity-90 text-white text-[12px] font-semibold py-2.5 rounded-lg transition-opacity shadow-sm cursor-pointer"
+        >
           Book Service
         </button>
       </div>

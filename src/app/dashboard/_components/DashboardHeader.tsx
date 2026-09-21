@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "@/services/api";
 import ThemeToggle from "@/components/ThemeToggle";
+import NotificationModal from "./NotificationModal";
 
 export default function DashboardHeader() {
   const [userName, setUserName] = useState<string>("User");
   const [isLoading, setIsLoading] = useState(true);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -28,6 +31,21 @@ export default function DashboardHeader() {
     };
 
     fetchUserProfile();
+  }, []);
+
+  // Dropdown ke bahar click hone par modal close karne ke liye
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -74,19 +92,34 @@ export default function DashboardHeader() {
           </span>
         </div>
 
-        {/* Notification Bell */}
-        <div className="relative cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center p-1">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            className="fill-primary"
-            xmlns="http://www.w3.org/2000/svg"
+        {/* Notification Bell Dropdown Container */}
+        <div className="relative" ref={notificationRef}>
+          <button
+            type="button"
+            onClick={() => setShowNotifications((prev) => !prev)}
+            className="relative cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center p-1 focus:outline-none"
+            aria-label="Open notifications"
           >
-            <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" />
-          </svg>
-          <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-error rounded-full border-2 border-header-bg"></span>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              className="fill-primary"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" />
+            </svg>
+            <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-error rounded-full border-2 border-header-bg"></span>
+          </button>
+
+          {/* Floating Notification Box */}
+          {showNotifications && (
+            <div className="absolute right-0 sm:-right-4 top-full mt-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <NotificationModal />
+            </div>
+          )}
         </div>
+
         <ThemeToggle />
       </div>
     </header>

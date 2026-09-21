@@ -88,7 +88,7 @@ export default function ServiceHistoryPage() {
   };
 
   return (
-    <div className="flex flex-col w-full px-2 sm:px-4 lg:px-6 pt-2 pb-20">
+    <div className="flex flex-col w-full px-2 sm:px-4 lg:px-0 pt-2 pb-20">
       {/* Tabs Header with Full-Width Grey Border Line */}
       <div className="w-full border-b border-border-main mb-8">
         <div className="flex items-center gap-10 sm:gap-12">
