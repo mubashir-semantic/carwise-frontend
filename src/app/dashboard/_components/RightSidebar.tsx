@@ -1,6 +1,10 @@
 import Image from "next/image";
 
-export default function RightSidebar() {
+interface RightSidebarProps {
+  onAddExpense?: () => void;
+}
+
+export default function RightSidebar({ onAddExpense }: RightSidebarProps) {
   const newsItems = [
     {
       id: 1,
@@ -40,7 +44,12 @@ export default function RightSidebar() {
           Expense <br /> History Upload
         </h3>
 
-        <button className="relative z-10 bg-white text-secondary px-6 py-2 rounded-[8px] text-[14px] font-semibold flex items-center gap-2 shadow-xs transition-transform hover:scale-105 cursor-pointer">
+        {/* Upload Button connected via onAddExpense Prop */}
+        <button
+          type="button"
+          onClick={onAddExpense}
+          className="relative z-10 bg-white text-secondary px-6 py-2 rounded-[8px] text-[14px] font-semibold flex items-center gap-2 shadow-xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+        >
           <span>Upload</span>
           <svg
             width="18"

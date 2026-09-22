@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { isAxiosError } from "axios";
@@ -9,20 +9,33 @@ import Input from "@/components/Input";
 
 type TabType = "overview" | "profile" | "passwords" | "notifications";
 
+const capitalizeWords = (str: string) => {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 export default function SettingsPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // User State
+  // Dynamic User State
   const [profileData, setProfileData] = useState({
-    firstName: "Stephen",
+    firstName: "",
     lastName: "",
-    customerId: "8523633",
-    email: "faisal@netmark.no",
-    address: "2972 Westheimer Rd. Santa Ana, Illinois 85486",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+    fullName: "",
+    customerId: "",
+    email: "",
+    address: "",
+    avatar: "",
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -35,22 +48,142 @@ export default function SettingsPage() {
     "device" | "mail" | "dont_send"
   >("device");
 
-  // 1. BACKEND LOGOUT HANDLER
+  // 1. FETCH PROFILE FROM BACKEND
+  const fetchUserProfile = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get("/users/profile");
+      const user = response.data?.user || response.data;
+
+      if (user) {
+        const rawName = user.username || user.name || "User";
+        const formattedFullName = capitalizeWords(rawName);
+
+        const nameParts = formattedFullName.trim().split(" ");
+        const fName = user.firstName
+          ? capitalizeWords(user.firstName)
+          : nameParts[0] || "";
+        const lName = user.lastName
+          ? capitalizeWords(user.lastName)
+          : nameParts.slice(1).join(" ") || "";
+
+        const generatedCustomerId =
+          user.customerId ||
+          (user._id
+            ? `CW-${user._id.slice(-6).toUpperCase()}`
+            : "Not assigned");
+
+        setProfileData({
+          firstName: fName,
+          lastName: lName,
+          fullName: formattedFullName,
+          customerId: generatedCustomerId,
+          email: user.email || "",
+          address: user.address || "",
+          avatar:
+            user.avatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              formattedFullName,
+            )}&background=f5924a&color=fff&bold=true`,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching user profile in Settings:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchUserProfile();
+  }, []);
+
+  // 2. IMAGE UPLOAD HANDLER
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // 2MB limit
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Image size should be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileData((prev) => ({
+          ...prev,
+          avatar: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // 3. IMAGE DELETE HANDLER
+  const handleDeleteImage = () => {
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      profileData.fullName || "User",
+    )}&background=f5924a&color=fff&bold=true`;
+
+    setProfileData((prev) => ({
+      ...prev,
+      avatar: defaultAvatar,
+    }));
+    toast.success("Picture removed");
+  };
+
+  // 4. BACKEND UPDATE PROFILE (PUT /users/profile)
+  const handleSaveProfile = async () => {
+    setIsSubmitting(true);
+    try {
+      const combinedUsername =
+        `${profileData.firstName} ${profileData.lastName}`.trim();
+      const finalUsername = capitalizeWords(
+        combinedUsername || profileData.fullName,
+      );
+
+      const payload = {
+        username: finalUsername,
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        address: profileData.address,
+        avatar: profileData.avatar,
+      };
+
+      // Backend PUT endpoint call
+      const res = await api.put("/users/profile", payload);
+
+      toast.success(res.data?.message || "Profile updated successfully!");
+
+      setProfileData((prev) => ({
+        ...prev,
+        fullName: finalUsername,
+      }));
+
+      setActiveTab("overview");
+    } catch (error) {
+      const msg = isAxiosError(error)
+        ? error.response?.data?.message
+        : "Failed to update profile";
+      toast.error(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 5. LOGOUT HANDLER
   const handleLogout = async () => {
     try {
-      // Backend par refresh token revoke karein
       await api.post("/auth/logout");
     } catch (error) {
-      console.error("Backend logout notice:", error);
+      console.error("Backend logout error:", error);
     } finally {
-      // Client-side storage clear karein
       localStorage.removeItem("token");
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       sessionStorage.clear();
 
-      // Temporary cookies expire karein
       document.cookie =
         "auth_flow_step=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
 
@@ -59,7 +192,7 @@ export default function SettingsPage() {
     }
   };
 
-  // 2. BACKEND CHANGE PASSWORD HANDLER
+  // 6. CHANGE PASSWORD HANDLER
   const handleChangePassword = async () => {
     if (!passwordData.oldPassword || !passwordData.newPassword) {
       toast.error("Please fill in all password fields");
@@ -96,6 +229,7 @@ export default function SettingsPage() {
   };
 
   const handleDiscard = () => {
+    fetchUserProfile(); // Revert unsaved edits
     setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
     setActiveTab("overview");
   };
@@ -108,6 +242,15 @@ export default function SettingsPage() {
 
   return (
     <div className="w-full bg-surface min-h-[88vh] px-6 sm:px-10 lg:px-14 py-8 text-text-main transition-colors duration-200">
+      {/* Hidden File Input for Picture Upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageUpload}
+        accept="image/*"
+        className="hidden"
+      />
+
       {/* Dynamic Heading */}
       <h1 className="text-2xl sm:text-3xl font-bold text-text-heading tracking-tight mb-8">
         {activeTab === "overview" && "Settings"}
@@ -123,13 +266,17 @@ export default function SettingsPage() {
           {/* ================= VIEW 1: OVERVIEW ================= */}
           {activeTab === "overview" && (
             <div>
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-border-subtle shadow-xs mb-10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={profileData.avatar}
-                  alt={profileData.firstName}
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-border-subtle shadow-xs mb-10 bg-surface-subtle">
+                {isLoading ? (
+                  <div className="w-full h-full animate-pulse bg-surface-subtle" />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={profileData.avatar}
+                    alt={profileData.fullName}
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
 
               <div className="flex flex-col text-[14px] sm:text-[15px]">
@@ -138,7 +285,7 @@ export default function SettingsPage() {
                     Full Name
                   </span>
                   <span className="text-text-secondary mt-1 sm:mt-0 font-normal">
-                    Faisal Rahman
+                    {isLoading ? "Loading..." : profileData.fullName || "User"}
                   </span>
                 </div>
 
@@ -147,7 +294,7 @@ export default function SettingsPage() {
                     Customer ID
                   </span>
                   <span className="text-text-secondary mt-1 sm:mt-0 font-normal">
-                    {profileData.customerId}
+                    {isLoading ? "..." : profileData.customerId}
                   </span>
                 </div>
 
@@ -156,7 +303,7 @@ export default function SettingsPage() {
                     Email Address
                   </span>
                   <span className="text-text-secondary mt-1 sm:mt-0 font-normal">
-                    {profileData.email}
+                    {isLoading ? "..." : profileData.email}
                   </span>
                 </div>
 
@@ -164,8 +311,16 @@ export default function SettingsPage() {
                   <span className="w-44 text-text-heading font-medium shrink-0 pt-0.5">
                     Home address
                   </span>
-                  <span className="text-text-secondary mt-1 sm:mt-0 font-normal max-w-sm leading-relaxed">
-                    {profileData.address}
+                  <span
+                    className={`mt-1 sm:mt-0 font-normal max-w-sm leading-relaxed ${
+                      !profileData.address
+                        ? "text-text-muted italic"
+                        : "text-text-secondary"
+                    }`}
+                  >
+                    {isLoading
+                      ? "..."
+                      : profileData.address || "Not provided yet"}
                   </span>
                 </div>
               </div>
@@ -194,27 +349,29 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* ================= VIEW 2: PROFILE BASE ================= */}
+          {/* ================= VIEW 2: PROFILE BASE (FUNCTIONAL) ================= */}
           {activeTab === "profile" && (
             <div>
               <div className="flex items-center gap-4 mb-8">
-                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden shrink-0 border border-border-subtle">
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden shrink-0 border border-border-subtle bg-surface-subtle">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={profileData.avatar}
-                    alt={profileData.firstName}
+                    alt={profileData.fullName}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
+                    onClick={() => fileInputRef.current?.click()}
                     className="px-4 py-2 bg-primary-tint hover:opacity-90 text-primary text-[13px] font-semibold rounded-lg transition-opacity cursor-pointer"
                   >
                     Upload New Picture
                   </button>
                   <button
                     type="button"
+                    onClick={handleDeleteImage}
                     className="px-4 py-2 bg-surface border border-border-main hover:bg-surface-subtle text-error text-[13px] font-semibold rounded-lg transition-colors cursor-pointer"
                   >
                     Delete
@@ -234,6 +391,7 @@ export default function SettingsPage() {
                     </label>
                     <Input
                       type="text"
+                      placeholder="First name"
                       value={profileData.firstName}
                       onChange={(e) =>
                         setProfileData({
@@ -249,7 +407,7 @@ export default function SettingsPage() {
                     </label>
                     <Input
                       type="text"
-                      placeholder="Your last name"
+                      placeholder="Last name"
                       value={profileData.lastName}
                       onChange={(e) =>
                         setProfileData({
@@ -267,10 +425,10 @@ export default function SettingsPage() {
                   </label>
                   <Input
                     type="email"
+                    placeholder="Email address"
                     value={profileData.email}
-                    onChange={(e) =>
-                      setProfileData({ ...profileData, email: e.target.value })
-                    }
+                    disabled
+                    className="opacity-70 cursor-not-allowed"
                   />
                 </div>
 
@@ -280,6 +438,7 @@ export default function SettingsPage() {
                   </label>
                   <Input
                     type="text"
+                    placeholder="Enter your home address"
                     value={profileData.address}
                     onChange={(e) =>
                       setProfileData({
@@ -295,28 +454,27 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={handleDiscard}
+                  disabled={isSubmitting}
                   className="px-6 py-2 border border-border-main text-text-main hover:bg-surface-subtle rounded-lg text-sm font-medium transition-colors cursor-pointer"
                 >
                   Discard
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    toast.success("Profile saved successfully!");
-                    setActiveTab("overview");
-                  }}
-                  className="px-6 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm font-semibold shadow-xs transition-opacity cursor-pointer"
+                  onClick={handleSaveProfile}
+                  disabled={isSubmitting}
+                  className="px-6 py-2 bg-primary hover:opacity-90 text-white rounded-lg text-sm font-semibold shadow-xs transition-opacity cursor-pointer disabled:opacity-50"
                 >
-                  Save Changes
+                  {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>
           )}
 
-          {/* ================= VIEW 3: PASSWORDS (API CONNECTED) ================= */}
+          {/* ================= VIEW 3: PASSWORDS ================= */}
           {activeTab === "passwords" && (
             <div>
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden shrink-0 mb-8 border border-border-subtle">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden shrink-0 mb-8 border border-border-subtle bg-surface-subtle">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={profileData.avatar}
@@ -406,7 +564,7 @@ export default function SettingsPage() {
           {/* ================= VIEW 4: NOTIFICATIONS ================= */}
           {activeTab === "notifications" && (
             <div>
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden shrink-0 mb-8 border border-border-subtle">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden shrink-0 mb-8 border border-border-subtle bg-surface-subtle">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={profileData.avatar}
@@ -545,7 +703,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("passwords")}
-                  className={`w-full flex items-center gap-3.5 py-3 rounded-xl border- 1px text-[14px] font-medium transition-colors text-left cursor-pointer ${
+                  className={`w-full flex items-center gap-3.5 py-3 rounded-xl text-[14px] font-medium transition-colors text-left cursor-pointer ${
                     activeTab === "passwords"
                       ? "text-primary"
                       : "text-text-secondary hover:text-text-heading"

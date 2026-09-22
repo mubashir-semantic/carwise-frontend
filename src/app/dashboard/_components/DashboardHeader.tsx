@@ -1,37 +1,69 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import api from "@/services/api";
 import ThemeToggle from "@/components/ThemeToggle";
 import NotificationModal from "./NotificationModal";
 
+const capitalizeWords = (str: string) => {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 export default function DashboardHeader() {
   const [userName, setUserName] = useState<string>("User");
-  const [isLoading, setIsLoading] = useState(true);
+  const [userAvatar, setUserAvatar] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await api.get("/users/profile");
-        const userData = response.data?.user || response.data;
+  // Fetch function (Bina synchronous setIsLoading ke)
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const response = await api.get("/users/profile");
+      const userData = response.data?.user || response.data;
 
-        if (userData && userData.username) {
-          setUserName(userData.username);
-        } else if (userData && userData.name) {
-          setUserName(userData.name);
+      if (userData) {
+        const rawName = userData.username || userData.name || "User";
+        const formattedName = capitalizeWords(rawName);
+        setUserName(formattedName);
+
+        if (userData.avatar) {
+          setUserAvatar(userData.avatar);
+        } else {
+          setUserAvatar(
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              formattedName,
+            )}&background=f5924a&color=fff&bold=true`,
+          );
         }
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      } finally {
-        setIsLoading(false);
       }
+    } catch (error) {
+      console.error("Error fetching user profile in header:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchUserProfile();
+
+    const handleProfileUpdate = () => {
+      fetchUserProfile();
     };
 
-    fetchUserProfile();
-  }, []);
+    window.addEventListener("profileUpdated", handleProfileUpdate);
+    return () => {
+      window.removeEventListener("profileUpdated", handleProfileUpdate);
+    };
+  }, [fetchUserProfile]);
 
   // Dropdown ke bahar click hone par modal close karne ke liye
   useEffect(() => {
@@ -70,27 +102,32 @@ export default function DashboardHeader() {
 
       {/* Right: Actions & Profile */}
       <div className="flex items-center gap-3 sm:gap-6 lg:gap-8">
-        {/* Get The App Button */}
         <button className="hidden sm:inline-flex bg-primary hover:opacity-90 transition-opacity text-white px-5 lg:px-6 py-2 rounded-lg font-semibold text-[13px] lg:text-[14px] shadow-sm whitespace-nowrap">
           Get The App
         </button>
 
-        {/* User Info */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-surface-subtle border border-border-main shrink-0">
+        <Link
+          href="/dashboard/settings"
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer group transition-opacity hover:opacity-90"
+          title="Go to Settings"
+        >
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-surface-subtle border border-border-main shrink-0 transition-transform group-hover:scale-105">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                userName,
-              )}&background=f5924a&color=fff&bold=true`}
-              alt="User Avatar"
+              src={
+                userAvatar ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  userName,
+                )}&background=f5924a&color=fff&bold=true`
+              }
+              alt={userName}
               className="object-cover w-full h-full"
             />
           </div>
-          <span className="hidden sm:inline text-[14px] sm:text-[15px] font-medium tracking-wide text-white truncate max-w-[120px] md:max-w-none">
-            {isLoading ? "..." : `Hii, ${userName}`}
+          <span className="hidden sm:inline text-[14px] sm:text-[15px] font-medium tracking-wide text-white group-hover:text-primary transition-colors truncate max-w-[140px] md:max-w-none">
+            {isLoading ? "..." : `${userName}`}
           </span>
-        </div>
+        </Link>
 
         {/* Notification Bell Dropdown Container */}
         <div className="relative" ref={notificationRef}>
@@ -112,7 +149,6 @@ export default function DashboardHeader() {
             <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-error rounded-full border-2 border-header-bg"></span>
           </button>
 
-          {/* Floating Notification Box */}
           {showNotifications && (
             <div className="absolute right-0 sm:-right-4 top-full mt-3 z-50 animate-in fade-in zoom-in-95 duration-150">
               <NotificationModal />
