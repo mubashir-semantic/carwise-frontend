@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import api from "@/services/api";
 import { isAxiosError } from "axios";
 import toast from "react-hot-toast";
+import { useGoogleLogin } from "@react-oauth/google";
 
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -32,6 +33,7 @@ export default function SignupPage() {
     resolver: zodResolver(signupSchema),
   });
 
+  // Regular Form Signup
   const onSubmit = async (data: SignupFormValues) => {
     setIsLoading(true);
     try {
@@ -54,6 +56,38 @@ export default function SignupPage() {
       setIsLoading(false);
     }
   };
+
+  // Google OAuth Popup Trigger
+  const handleGoogleSignup = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setIsLoading(true);
+      try {
+        const response = await api.post("/auth/google", {
+          accessToken: tokenResponse.access_token,
+        });
+
+        const accessToken = response.data.accessToken;
+        const refreshToken = response.data.refreshToken;
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
+        toast.success("Google Signup Successful!");
+        router.push("/dashboard");
+      } catch (error) {
+        const errorMessage = isAxiosError(error)
+          ? error.response?.data?.message
+          : "Google signup failed on backend.";
+
+        toast.error(errorMessage || "Google signup failed.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: () => {
+      toast.error("Google authentication cancelled or failed.");
+    },
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-subtle text-text-main">
@@ -189,11 +223,17 @@ export default function SignupPage() {
 
             {/* Social Buttons */}
             <div className="grid grid-cols-3 gap-3.5">
-              <SocialButton icon={<FcGoogle size={22} />} />
               <SocialButton
+                type="button"
+                onClick={() => handleGoogleSignup()}
+                icon={<FcGoogle size={22} />}
+              />
+              <SocialButton
+                type="button"
                 icon={<FaFacebook size={22} className="text-[#1877f2]" />}
               />
               <SocialButton
+                type="button"
                 icon={<FaInstagram size={22} className="text-[#e4405f]" />}
               />
             </div>
