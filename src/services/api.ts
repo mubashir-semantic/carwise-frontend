@@ -1,4 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import toast from "react-hot-toast"; // Toast zaroor import karein
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
@@ -50,10 +51,27 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
-    // Agar error 401 na ho ya request config missing ho
-    if (!error.response || error.response.status !== 401 || !originalRequest) {
+    if (!error.response || !originalRequest) {
       return Promise.reject(error);
     }
+
+    // --- MAIN FIX YAHAN HAI ---
+    // Check karein ke API route Auth ka toh nahi hai
+    const isAuthRoute =
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/signup") ||
+      originalRequest.url?.includes("/auth/google");
+
+    // Agar Login/Signup pe 401 aaye, toh page refresh mat karein, component ko error handle karne dein
+    if (error.response.status === 401 && isAuthRoute) {
+      return Promise.reject(error);
+    }
+
+    // Agar error 401 na ho (maslan 400, 500) toh bhi component ko bhej dein
+    if (error.response.status !== 401) {
+      return Promise.reject(error);
+    }
+    // -------------------------
 
     // Refresh endpoint khud fail ho jaye toh infinite loop se bachayein
     if (originalRequest.url?.includes("/auth/refresh")) {
@@ -125,8 +143,19 @@ function logoutUser() {
   if (typeof window !== "undefined") {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.href = "/login";
+
+    // Agar user pehle se login page par nahi hai tabhi redirect karein
+    if (window.location.pathname !== "/login") {
+      toast.error("Session expired. Please log in again.", {
+        id: "session-expired",
+      });
+
+      // Toast parhne ka time dein, phir login par redirect karein
+      setTimeout(() => {
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.href = "/login";
+      }, 1500);
+    }
   }
 }
 

@@ -6,7 +6,7 @@ import {
   FaFacebook,
   FaInstagram,
 } from "react-icons/fa";
-import Container from "@/components/Container";
+import Container from "@/components/ui/Container";
 
 export default function Footer() {
   return (

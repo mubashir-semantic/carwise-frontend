@@ -13,12 +13,12 @@ import api from "@/services/api";
 import { isAxiosError } from "axios";
 import toast from "react-hot-toast";
 
-import Input from "@/components/Input";
-import Button from "@/components/Button";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Container from "@/components/Container";
-import AuthLink from "@/components/AuthLink";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Container from "@/components/ui/Container";
+import AuthLink from "@/components/auth/AuthLink";
 
 export default function ChangePasswordPage() {
   const [isLoading, setIsLoading] = useState(false);

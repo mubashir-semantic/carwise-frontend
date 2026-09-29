@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { isAxiosError } from "axios";
 import api from "@/services/api";
-import Input from "@/components/Input";
+import Input from "@/components/ui/Input";
 
 type TabType = "overview" | "profile" | "passwords" | "notifications";
 

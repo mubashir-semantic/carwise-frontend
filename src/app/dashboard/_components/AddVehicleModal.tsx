@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import api from "@/services/api";
-import Modal from "./Modal";
-import FloatingInput from "./FloatingInput";
+import Modal from "../../../components/ui/Modal";
+import FloatingInput from "../../../components/ui/FloatingInput";
 import Image from "next/image";
 import axios from "axios";
 

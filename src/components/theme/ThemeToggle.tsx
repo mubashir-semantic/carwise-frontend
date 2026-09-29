@@ -33,10 +33,7 @@ export default function ThemeToggle() {
       {isDark ? (
         <FiSun size={18} className="text-warning transition-transform" />
       ) : (
-        <FiMoon
-          size={18}
-          className="text-text-secondary transition-transform"
-        />
+        <FiMoon size={18} className="text-warning transition-transform" />
       )}
     </button>
   );

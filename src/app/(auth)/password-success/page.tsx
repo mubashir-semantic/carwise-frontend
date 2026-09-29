@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import Button from "@/components/Button";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Container from "@/components/Container";
+import Button from "@/components/ui/Button";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Container from "@/components/ui/Container";
 
 export default function PasswordSuccessPage() {
   return (

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
-import AddVehicleModal from "@/components/ui/AddVehicleModal";
+import AddVehicleModal from "@/app/dashboard/_components/AddVehicleModal";
 import api from "@/services/api";
 import toast from "react-hot-toast";
 

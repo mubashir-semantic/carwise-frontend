@@ -13,13 +13,13 @@ import { isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
 
-import Input from "@/components/Input";
-import Button from "@/components/Button";
-import SocialButton from "@/components/SocialButton";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Container from "@/components/Container";
-import AuthLink from "@/components/AuthLink";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import SocialButton from "@/components/auth/SocialButton";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Container from "@/components/ui/Container";
+import AuthLink from "@/components/auth/AuthLink";
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
