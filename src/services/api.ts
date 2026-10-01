@@ -2,7 +2,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import toast from "react-hot-toast"; // Toast zaroor import karein
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -112,9 +112,10 @@ api.interceptors.response.use(
 
     try {
       // Direct axios call taake interceptor loop na bane
-      const response = await axios.post(`${BASE_URL}/auth/refresh`, {
-        refreshToken,
-      });
+      const response = await axios.post(
+        `${BASE_URL.replace(/\/+$/, "")}/auth/refresh-token`,
+        { refreshToken },
+      );
 
       const { accessToken, refreshToken: newRefreshToken } = response.data;
 
