@@ -112,9 +112,10 @@ api.interceptors.response.use(
 
     try {
       // Direct axios call taake interceptor loop na bane
-      const response = await axios.post(`${BASE_URL}/auth/refresh`, {
-        refreshToken,
-      });
+      const response = await axios.post(
+        `${BASE_URL.replace(/\/+$/, "")}/auth/refresh-token`,
+        { refreshToken },
+      );
 
       const { accessToken, refreshToken: newRefreshToken } = response.data;
 
