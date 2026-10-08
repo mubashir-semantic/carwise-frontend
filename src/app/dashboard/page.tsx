@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; // useEffect import kiya hai
 import HeroBanner from "./_components/HeroBanner";
 import StatsCards from "./_components/StatsCards";
 import CarStatus from "./_components/CarStatus";
 import RightSidebar from "./_components/RightSidebar";
 import AddExpenseModal from "./_components/AddExpenseModal";
+import { initSocket, disconnectSocket } from "@/services/socket"; // Socket functions import kiye hain
 
 export default function DashboardPage() {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+
+  // Socket connection ke liye useEffect laga diya
+  useEffect(() => {
+    initSocket(); // Component load hote hi backend se connect hoga
+
+    return () => {
+      disconnectSocket(); // Component unmount (page change) hone par disconnect hoga
+    };
+  }, []);
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 w-full mt-2 sm:mt-4 min-w-0">
