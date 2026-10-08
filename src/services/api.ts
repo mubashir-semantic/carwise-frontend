@@ -1,8 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import toast from "react-hot-toast"; // Toast zaroor import karein
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -74,7 +73,7 @@ api.interceptors.response.use(
     // -------------------------
 
     // Refresh endpoint khud fail ho jaye toh infinite loop se bachayein
-    if (originalRequest.url?.includes("/auth/refresh")) {
+    if (originalRequest.url?.includes("/auth/refresh-token")) {
       logoutUser();
       return Promise.reject(error);
     }
