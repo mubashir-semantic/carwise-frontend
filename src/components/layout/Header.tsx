@@ -167,8 +167,9 @@ export default function Header() {
                 onMouseEnter={() => setShowUserMenu(true)}
                 onMouseLeave={() => setShowUserMenu(false)}
               >
-                <button
-                  onClick={() => setShowUserMenu((prev) => !prev)}
+                <Link
+                  href="/dashboard/settings"
+                  onClick={() => setShowUserMenu(false)}
                   className="flex items-center gap-2 sm:gap-3 cursor-pointer group focus:outline-none py-1"
                 >
                   <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-surface-subtle border border-border-main shrink-0 transition-transform group-hover:scale-105">
@@ -186,7 +187,7 @@ export default function Header() {
                   <span className="hidden sm:inline text-[14px] sm:text-[15px] font-medium tracking-wide text-white group-hover:text-primary transition-colors truncate max-w-[140px]">
                     {isLoading ? "..." : userName}
                   </span>
-                </button>
+                </Link>
 
                 {showUserMenu && (
                   <div className="absolute right-0 top-full pt-2 w-56 z-50">

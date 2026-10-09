@@ -1,12 +1,10 @@
 import { io, Socket } from "socket.io-client";
 
 const getSocketUrl = () => {
-  // 1. Agar aapne .env file mein live URL diya hoga toh wo pehle uthayega
   if (process.env.NEXT_PUBLIC_SOCKET_URL) {
     return process.env.NEXT_PUBLIC_SOCKET_URL;
   }
 
-  // 2. Agar local ya IP par hain, toh browser se khud detect kar lega (localhost ho ya 192.168...)
   if (typeof window !== "undefined") {
     const protocol = window.location.protocol;
     const hostname = window.location.hostname;

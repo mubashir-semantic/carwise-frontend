@@ -8,7 +8,7 @@ interface SidebarProps {
   contacts: UserContact[];
   activeContact: UserContact | null;
   setActiveContact: (contact: UserContact) => void;
-  onlineUsers: string[]; // <-- Tyescript error fix
+  onlineUsers: string[];
 }
 
 export const getDisplayName = (user: UserContact) => {
@@ -45,7 +45,7 @@ export default function Sidebar({
   contacts,
   activeContact,
   setActiveContact,
-  onlineUsers, // <-- Prop received
+  onlineUsers,
 }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
@@ -53,7 +53,7 @@ export default function Sidebar({
 
   const filteredContacts = contacts
     .filter((contact) =>
-      activeTab === "unread" ? contact.unread && contact.unread > 0 : true,
+      activeTab === "unread" ? (contact.unread || 0) > 0 : true,
     )
     .sort((a, b) => {
       if (sortBy === "recent") {
@@ -124,9 +124,10 @@ export default function Sidebar({
           filteredContacts.map((contact) => {
             const isActive = activeContact?._id === contact._id;
             const displayName = getDisplayName(contact);
-            const isUnread = contact.unread && contact.unread > 0;
 
-            // Check agar user id onlineUsers array mein hai
+            // MAGIC FIX: React "0" print issue fixed here
+            const isUnread = (contact.unread || 0) > 0;
+
             const isOnline = onlineUsers.includes(contact._id);
 
             let avatarSrc = contact.avatar;
@@ -140,7 +141,6 @@ export default function Sidebar({
                 onClick={() => setActiveContact(contact)}
                 className={`flex items-start p-4 cursor-pointer transition-colors border-l-[3px] ${isActive ? "bg-primary-tint border-primary" : "bg-surface border-transparent hover:bg-surface-subtle"}`}
               >
-                {/* Avatar with Online Indicator */}
                 <div className="relative shrink-0 mr-3">
                   <Image
                     src={avatarSrc}
@@ -158,13 +158,25 @@ export default function Sidebar({
                 <div className="flex-1 min-w-0 pt-0.5">
                   <div className="flex justify-between items-baseline mb-1">
                     <h4
-                      className={`text-[13px] truncate ${isUnread ? "font-bold text-text-main" : "font-semibold text-text-main"}`}
+                      className={`text-[13px] truncate ${
+                        isActive
+                          ? "font-bold text-secondary"
+                          : isUnread
+                            ? "font-bold text-text-main"
+                            : "font-semibold text-text-main"
+                      }`}
                     >
                       {displayName}
                     </h4>
                     {contact.lastMessageTime && (
                       <span
-                        className={`text-[10px] ml-2 shrink-0 ${isUnread ? "text-primary font-semibold" : "text-text-muted"}`}
+                        className={`text-[10px] ml-2 shrink-0 ${
+                          isActive
+                            ? "text-primary font-bold"
+                            : isUnread
+                              ? "text-primary font-semibold"
+                              : "text-text-muted"
+                        }`}
                       >
                         {new Date(contact.lastMessageTime).toLocaleTimeString(
                           [],
@@ -175,7 +187,13 @@ export default function Sidebar({
                   </div>
                   <div className="flex justify-between items-center">
                     <p
-                      className={`text-[12px] truncate mr-2 ${isUnread ? "text-text-main font-medium" : "text-text-secondary"}`}
+                      className={`text-[12px] truncate mr-2 ${
+                        isActive
+                          ? "text-secondary font-medium"
+                          : isUnread
+                            ? "text-text-main font-medium"
+                            : "text-text-secondary"
+                      }`}
                     >
                       {contact.lastMessage || contact.email}
                     </p>
