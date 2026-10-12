@@ -12,7 +12,8 @@ import {
 } from "react-icons/fa";
 import api from "@/services/api";
 import ThemeToggle from "@/components/theme/ThemeToggle";
-import NotificationModal from "@/app/dashboard/_components/NotificationModal";
+import NotificationModal from "@/app/dashboard/notifications/components/NotificationModal";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const capitalizeWords = (str: string) => {
   if (!str) return "";
@@ -34,6 +35,9 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // Notifications (backend se): panel mein latest 5
+  const notif = useNotifications(5);
 
   // Refs for outside click detection
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -233,7 +237,10 @@ export default function Header() {
               {/* Notifications */}
               <div className="relative" ref={notificationRef}>
                 <button
-                  onClick={() => setShowNotifications((prev) => !prev)}
+                  onClick={() => {
+                    setShowNotifications((prev) => !prev);
+                    notif.refresh();
+                  }}
                   className="relative cursor-pointer hover:text-primary text-white/90 transition-colors p-1 focus:outline-none"
                 >
                   <svg
@@ -245,11 +252,23 @@ export default function Header() {
                   >
                     <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" />
                   </svg>
-                  <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-error rounded-full border-2 border-header-bg"></span>
+                  {notif.unreadCount > 0 && (
+                    <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-error rounded-full border-2 border-header-bg"></span>
+                  )}
                 </button>
                 {showNotifications && (
                   <div className="absolute right-0 mt-3 z-50">
-                    <NotificationModal />
+                    <NotificationModal
+                      items={notif.items}
+                      unreadCount={notif.unreadCount}
+                      loading={notif.loading}
+                      selfAvatar={userAvatar}
+                      onRead={notif.markRead}
+                      onReadAll={notif.markAllRead}
+                      onAction={notif.performAction}
+                      onDelete={notif.remove}
+                      onClose={() => setShowNotifications(false)}
+                    />
                   </div>
                 )}
               </div>
