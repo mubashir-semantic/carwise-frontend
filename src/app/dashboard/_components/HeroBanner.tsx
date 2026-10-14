@@ -30,7 +30,7 @@ export default function HeroBanner() {
       <div className="relative z-10 w-full md:w-1/2 flex justify-center md:justify-start">
         <div className="relative w-[280px] sm:w-[320px] h-[190px] sm:h-[220px]">
           <Image
-            src="/group 20377.png"
+            src="/Group 20377.png"
             alt="Easy Servicing Way Illustration"
             fill
             className="object-contain"
