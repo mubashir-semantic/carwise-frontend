@@ -7,7 +7,12 @@ import { usePathname } from "next/navigation";
 export default function BottomNavigation() {
   const pathname = usePathname();
 
-  const navItems = [
+  const navItems: {
+    label: string;
+    href: string;
+    also?: string[];
+    icon: (active: boolean) => React.ReactNode;
+  }[] = [
     {
       label: "Dashboard",
       href: "/dashboard",
@@ -24,6 +29,47 @@ export default function BottomNavigation() {
           strokeLinejoin="round"
         >
           <path d="M3 10.5L12 3l9 7.5V20a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2v-9.5z" />
+        </svg>
+      ),
+    },
+    {
+      label: "Book a service",
+      href: "/dashboard/workshops",
+      also: ["/dashboard/book"],
+      icon: (active: boolean) => (
+        <svg
+          className={`w-6 h-6 transition-transform ${
+            active ? "text-white scale-105" : "text-text-main"
+          }`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+      ),
+    },
+    {
+      label: "My bookings",
+      href: "/dashboard/my-bookings",
+      icon: (active: boolean) => (
+        <svg
+          className={`w-6 h-6 transition-transform ${
+            active ? "text-white scale-105" : "text-text-main"
+          }`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
         </svg>
       ),
     },
@@ -72,12 +118,14 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md py-3 px-8 flex justify-around items-center lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-border-subtle">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md py-3 px-3 flex justify-around items-center lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-border-subtle">
       {navItems.map((item) => {
         const isActive =
           item.href === "/dashboard"
             ? pathname === "/dashboard"
-            : pathname.startsWith(item.href);
+            : [item.href, ...(item.also ?? [])].some((prefix) =>
+                pathname.startsWith(prefix),
+              );
 
         return (
           <Link
@@ -86,11 +134,11 @@ export default function BottomNavigation() {
             className="flex items-center justify-center p-1"
           >
             {isActive ? (
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-md shadow-primary/30 transition-transform active:scale-95">
+              <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-md shadow-primary/30 transition-transform active:scale-95">
                 {item.icon(true)}
               </div>
             ) : (
-              <div className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-surface-subtle transition-colors">
+              <div className="w-11 h-11 rounded-full flex items-center justify-center hover:bg-surface-subtle transition-colors">
                 {item.icon(false)}
               </div>
             )}
