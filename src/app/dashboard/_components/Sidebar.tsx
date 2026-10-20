@@ -9,10 +9,25 @@ import {
   FiFileText,
   FiInbox,
   FiSettings,
+  FiTool,
+  FiClipboard,
 } from "react-icons/fi";
 
-const menuItems = [
+// `also` = in paths par bhi ye item active dikhe (booking ke andar ke pages)
+const menuItems: {
+  name: string;
+  icon: typeof FiGrid;
+  path: string;
+  also?: string[];
+}[] = [
   { name: "Dashboard", icon: FiGrid, path: "/dashboard" },
+  {
+    name: "Book a service",
+    icon: FiTool,
+    path: "/dashboard/workshops",
+    also: ["/dashboard/book"],
+  },
+  { name: "My bookings", icon: FiClipboard, path: "/dashboard/my-bookings" },
   { name: "Expense history", icon: FiTrendingUp, path: "/dashboard/expense" },
   {
     name: "Service history",
@@ -34,7 +49,9 @@ export default function Sidebar() {
           const isActive =
             item.path === "/dashboard"
               ? pathname === "/dashboard"
-              : pathname.startsWith(item.path);
+              : [item.path, ...(item.also ?? [])].some((prefix) =>
+                  pathname.startsWith(prefix),
+                );
 
           return (
             <Link
@@ -79,12 +96,12 @@ export default function Sidebar() {
           and get 40% discount
         </p>
 
-        <button
-          type="button"
-          className="w-full bg-primary hover:opacity-90 text-white text-[12px] font-semibold py-2.5 rounded-lg transition-opacity shadow-sm cursor-pointer"
+        <Link
+          href="/dashboard/workshops"
+          className="block w-full bg-primary hover:opacity-90 text-white text-[12px] font-semibold py-2.5 rounded-lg transition-opacity shadow-sm cursor-pointer"
         >
           Book Service
-        </button>
+        </Link>
       </div>
     </div>
   );
