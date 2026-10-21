@@ -1,6 +1,6 @@
 import type { AxiosError } from "axios";
 
-// ---------- Types (backend ke jawab ke mutabiq) ----------
+// ---------- Types (according to backend response) ----------
 export type WorkshopItem = {
   _id: string;
   name: string;
@@ -98,7 +98,7 @@ export function statusBadgeClass(status: BookingStatus): string {
   }
 }
 
-// ---------- Styles (globals.css ke colors) ----------
+// ---------- Styles (globals.css colors) ----------
 export const INPUT_CLASS =
   "w-full rounded-xl border border-border-main bg-surface px-4 py-3 text-sm text-text-main placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-60";
 export const PRIMARY_BTN =
@@ -142,7 +142,7 @@ export function formatDateTime(value?: string): string {
   });
 }
 
-// Aaj ki tareekh yyyy-mm-dd (local time)
+// Today's date yyyy-mm-dd (local time)
 export function todayString(): string {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, "0");
@@ -150,7 +150,7 @@ export function todayString(): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
-// Vehicles API ka shape pakka nahi, isliye jo fields milen unse naam banate hain
+// Vehicle API shape is uncertain, so construct name from available fields
 export function vehicleLabel(vehicle?: Record<string, unknown> | null): string {
   if (!vehicle) return "-";
   const pick = (...keys: string[]) => {
@@ -173,7 +173,7 @@ export function vehicleLabel(vehicle?: Record<string, unknown> | null): string {
   return [name, plate].filter(Boolean).join(" · ") || "My vehicle";
 }
 
-// API kabhi array deti hai kabhi {items: []}
+// API sometimes returns an array and sometimes {items: []}
 export function unwrapList<T>(data: unknown): T[] {
   if (Array.isArray(data)) return data as T[];
   if (data && typeof data === "object") {
@@ -202,7 +202,7 @@ export function workshopPoint(workshop: WorkshopItem): LatLng | null {
   return null;
 }
 
-// Do points ke darmiyan fasla (km) - haversine
+// Distance between two points (km) - haversine formula
 export function distanceKm(a: LatLng, b: LatLng): number {
   const rad = (deg: number) => (deg * Math.PI) / 180;
   const dLat = rad(b.lat - a.lat);
@@ -214,5 +214,7 @@ export function distanceKm(a: LatLng, b: LatLng): number {
 }
 
 export function formatDistance(km: number): string {
-  return km < 1 ? `${Math.round(km * 1000)} m away` : `${km.toFixed(1)} km away`;
+  return km < 1
+    ? `${Math.round(km * 1000)} m away`
+    : `${km.toFixed(1)} km away`;
 }

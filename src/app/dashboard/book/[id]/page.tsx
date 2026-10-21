@@ -26,7 +26,7 @@ import { ErrorBlock, LoadingBlock } from "../../_components/StateBlocks";
 
 type Errors = Partial<Record<"services" | "date" | "slot" | "pickup", string>>;
 
-// Figma ke "My Cart" + "Review Booking" ek page par
+// Figma's "My Cart" + "Review Booking" on a single page
 export default function ReviewBookingPage() {
   const params = useParams<{ id: string }>();
   const workshopId = params?.id;
@@ -92,12 +92,15 @@ export default function ReviewBookingPage() {
 
   function validate(): Errors {
     const found: Errors = {};
-    if (cart.length === 0) found.services = "Cart khali hai";
-    if (!draft!.date) found.date = "Date chuno";
-    else if (draft!.date < today) found.date = "Purani date nahi chun sakte";
-    if (!draft!.timeSlot) found.slot = "Time slot chuno";
-    if (draft!.serviceType === "pickup_delivery" && !draft!.pickupAddress.trim())
-      found.pickup = "Pickup address likho";
+    if (cart.length === 0) found.services = "Cart is empty";
+    if (!draft!.date) found.date = "Please select a date";
+    else if (draft!.date < today) found.date = "Cannot select a past date";
+    if (!draft!.timeSlot) found.slot = "Please select a time slot";
+    if (
+      draft!.serviceType === "pickup_delivery" &&
+      !draft!.pickupAddress.trim()
+    )
+      found.pickup = "Please enter a pickup address";
     return found;
   }
 
@@ -107,7 +110,7 @@ export default function ReviewBookingPage() {
     const found = validate();
     setErrors(found);
     if (Object.keys(found).length > 0) {
-      toast.error("Form mein ghalti hai, dobara check karo");
+      toast.error("Please fix the errors in the form and try again");
       return;
     }
 
@@ -131,13 +134,15 @@ export default function ReviewBookingPage() {
       setCreated(res.data);
       clearDraft();
     } catch (err) {
-      toast.error(errorMessage(err, "Booking nahi ho saki, dobara try karo"));
+      toast.error(
+        errorMessage(err, "Could not complete booking, please try again"),
+      );
     } finally {
       setSubmitting(false);
     }
   }
 
-  // ---- Booking Successful (Figma ka dark screen) ----
+  // ---- Booking Successful (Figma dark screen) ----
   if (created) {
     return (
       <div className="mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center rounded-3xl bg-secondary px-6 py-14 text-center text-white">
@@ -157,7 +162,7 @@ export default function ReviewBookingPage() {
         </div>
         <h1 className="text-2xl font-bold">Booking Successful</h1>
         <p className="mt-3 text-sm text-white/70">
-          Workshop jald aapki booking confirm karegi.
+          The workshop will confirm your booking shortly.
         </p>
         <p className="mt-5 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold">
           {created.reference}
@@ -207,7 +212,7 @@ export default function ReviewBookingPage() {
             </div>
             {cart.length === 0 ? (
               <p className="text-sm text-text-muted">
-                Cart khali hai. Workshop ke page se services add karo.
+                Your cart is empty. Please add services from the workshop page.
               </p>
             ) : (
               <ul className="divide-y divide-border-subtle">
@@ -337,10 +342,12 @@ export default function ReviewBookingPage() {
                     </label>
                     <input
                       className={INPUT_CLASS}
-                      placeholder="Khali ho to pickup wala"
+                      placeholder="Leave blank to use pickup address"
                       value={draft.deliveryAddress}
                       maxLength={300}
-                      onChange={(e) => update({ deliveryAddress: e.target.value })}
+                      onChange={(e) =>
+                        update({ deliveryAddress: e.target.value })
+                      }
                     />
                   </div>
                 </>
@@ -356,7 +363,9 @@ export default function ReviewBookingPage() {
                   onChange={(e) => update({ vehicleId: e.target.value })}
                 >
                   <option value="">
-                    {vehicles.length === 0 ? "Koi gaari save nahi" : "Gaari chuno"}
+                    {vehicles.length === 0
+                      ? "No saved vehicles"
+                      : "Select a vehicle"}
                   </option>
                   {vehicles.map((vehicle) => (
                     <option key={vehicle._id} value={vehicle._id}>
@@ -372,7 +381,7 @@ export default function ReviewBookingPage() {
                 </label>
                 <textarea
                   className={`${INPUT_CLASS} h-28 resize-none`}
-                  placeholder="Write additional things"
+                  placeholder="Write additional notes"
                   value={draft.instructions}
                   maxLength={1000}
                   onChange={(e) => update({ instructions: e.target.value })}

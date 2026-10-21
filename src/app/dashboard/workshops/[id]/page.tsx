@@ -55,7 +55,7 @@ export default function WorkshopDetailsPage() {
       />
     );
 
-  // Cart sirf isi workshop ki services ki hoti hai
+  // Cart only contains services for this workshop
   const cart = draft.workshopId === workshop._id ? draft.services : [];
   const services = workshop.services ?? [];
   const visibleServices = showAll ? services : services.slice(0, 6);
@@ -121,7 +121,7 @@ export default function WorkshopDetailsPage() {
             </h2>
             {services.length === 0 ? (
               <p className="text-sm text-text-muted">
-                Is workshop ne abhi services add nahi ki.
+                This workshop has not added any services yet.
               </p>
             ) : (
               <>
@@ -204,7 +204,7 @@ export default function WorkshopDetailsPage() {
               />
             ) : (
               <p className="text-xs text-text-muted">
-                Is workshop ki map location abhi add nahi hui.
+                The map location for this workshop has not been added yet.
               </p>
             )}
           </div>
@@ -223,7 +223,9 @@ export default function WorkshopDetailsPage() {
               </div>
               <div>
                 <dt className="text-text-muted">Email</dt>
-                <dd className="break-all text-text-main">{workshop.email || "-"}</dd>
+                <dd className="break-all text-text-main">
+                  {workshop.email || "-"}
+                </dd>
               </div>
             </dl>
             <div className="my-5 border-t border-border-subtle" />
@@ -232,12 +234,12 @@ export default function WorkshopDetailsPage() {
             </h2>
             {cart.length === 0 ? (
               <p className="text-sm text-text-muted">
-                Kam az kam ek service &quot;Add to cart&quot; karo.
+                Please add at least one service to your cart.
               </p>
             ) : (
               <ul className="mb-3 space-y-1 text-sm text-text-main">
                 {cart.map((name) => (
-                  <li key={name}>• {name}</li>
+                  <li key={name}>{name}</li>
                 ))}
               </ul>
             )}
@@ -253,7 +255,7 @@ export default function WorkshopDetailsPage() {
         </aside>
       </div>
 
-      {/* Mobile: neeche sticky cart bar (bottom navigation ke upar) */}
+      {/* Mobile: sticky bottom cart bar */}
       <div className="fixed inset-x-0 bottom-[72px] z-30 px-4 lg:hidden">
         <button
           type="button"

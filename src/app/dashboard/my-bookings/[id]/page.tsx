@@ -71,7 +71,7 @@ export default function BookingDetailsPage() {
       setReason("");
       setReload((n) => n + 1);
     } catch (err) {
-      toast.error(errorMessage(err, "Booking cancel nahi ho saki"));
+      toast.error(errorMessage(err, "Could not cancel booking"));
     } finally {
       setCancelling(false);
     }
@@ -86,7 +86,8 @@ export default function BookingDetailsPage() {
       />
     );
 
-  const canCancel = booking.status === "pending" || booking.status === "confirmed";
+  const canCancel =
+    booking.status === "pending" || booking.status === "confirmed";
   const history = booking.statusHistory ?? [];
 
   return (
@@ -134,7 +135,10 @@ export default function BookingDetailsPage() {
               {booking.serviceType === "pickup_delivery" && (
                 <>
                   <Row label="Pickup address" value={booking.pickupAddress} />
-                  <Row label="Delivery address" value={booking.deliveryAddress} />
+                  <Row
+                    label="Delivery address"
+                    value={booking.deliveryAddress}
+                  />
                 </>
               )}
               <Row label="Instructions" value={booking.instructions} />
@@ -198,7 +202,9 @@ export default function BookingDetailsPage() {
               </div>
               <div>
                 <dt className="text-text-muted">Phone</dt>
-                <dd className="text-text-main">{booking.workshop?.phone ?? "-"}</dd>
+                <dd className="text-text-main">
+                  {booking.workshop?.phone ?? "-"}
+                </dd>
               </div>
             </dl>
           </section>
@@ -222,7 +228,7 @@ export default function BookingDetailsPage() {
               Cancel this booking?
             </h3>
             <p className="mb-4 text-sm text-text-muted">
-              Ye wapas nahi ho sakega. Wajah likhna zaroori nahi.
+              This cannot be undone. Providing a reason is optional.
             </p>
             <textarea
               className={`${INPUT_CLASS} h-24 resize-none`}
