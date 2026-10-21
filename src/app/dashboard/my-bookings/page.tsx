@@ -90,7 +90,7 @@ export default function MyBookingsPage() {
       ) : bookings.length === 0 ? (
         <EmptyBlock
           title="No bookings yet"
-          message="Abhi is list mein koi booking nahi hai."
+          message="There are no bookings in this list right now."
         >
           <Link href="/dashboard/workshops" className={PRIMARY_BTN}>
             Book a service

@@ -70,7 +70,7 @@ export default function ServiceBookingPage() {
     };
   }, [reload]);
 
-  // Search: naam / shehar / address; distance ho to sab se qareeb pehle
+  // Search: name / city / address; sort by closest distance if available
   const results = useMemo(() => {
     const query = term.trim().toLowerCase();
     const rows = workshops
@@ -107,11 +107,11 @@ export default function ServiceBookingPage() {
   function validate(): Errors {
     if (!draft) return {};
     const found: Errors = {};
-    if (!draft.date) found.date = "Date chuno";
+    if (!draft.date) found.date = "Please select a date";
     else if (draft.date < todayString())
-      found.date = "Purani date nahi chun sakte";
+      found.date = "Cannot select a past date";
     if (draft.serviceType === "pickup_delivery" && !draft.pickupAddress.trim())
-      found.pickup = "Pickup address likho";
+      found.pickup = "Please enter a pickup address";
     return found;
   }
 
@@ -128,7 +128,7 @@ export default function ServiceBookingPage() {
 
   function locateMe() {
     if (!navigator.geolocation) {
-      toast.error("Is browser mein location support nahi hai");
+      toast.error("Location is not supported in this browser");
       return;
     }
     setLocating(true);
@@ -142,7 +142,7 @@ export default function ServiceBookingPage() {
       },
       () => {
         setLocating(false);
-        toast.error("Location nahi mili. Browser mein location allow karo.");
+        toast.error("Could not get location. Please allow location access in your browser.");
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
@@ -150,7 +150,7 @@ export default function ServiceBookingPage() {
 
   function openWorkshop(id: string) {
     if (!draft) return;
-    // Doosri workshop chuni to purani cart ki services hata do
+    // If a different workshop is selected, clear the previous cart services
     update({
       workshopId: id,
       services: draft.workshopId === id ? draft.services : [],
@@ -166,7 +166,7 @@ export default function ServiceBookingPage() {
         Service booking
       </h1>
       <p className="mb-6 text-sm text-text-muted">
-        Apni zaroorat batao, phir qareeb ki workshop chuno.
+        Specify your requirements, then choose a nearby workshop.
       </p>
 
       {/* ---------- Criteria (Figma: Way of service) ---------- */}
@@ -199,7 +199,7 @@ export default function ServiceBookingPage() {
               </div>
               <input
                 className={INPUT_CLASS}
-                placeholder="Write your delivery address (khali ho to pickup wala)"
+                placeholder="Write your delivery address (leave blank to use pickup address)"
                 value={draft.deliveryAddress}
                 maxLength={300}
                 onChange={(e) => update({ deliveryAddress: e.target.value })}
@@ -214,7 +214,7 @@ export default function ServiceBookingPage() {
           >
             <option value="">
               {vehicles.length === 0
-                ? "Koi gaari save nahi (optional)"
+                ? "No saved vehicles (optional)"
                 : "Choose your vehicle (optional)"}
             </option>
             {vehicles.map((vehicle) => (
@@ -287,7 +287,7 @@ export default function ServiceBookingPage() {
               {results.length === 0 ? (
                 <EmptyBlock
                   title="No workshops found"
-                  message="Doosra naam ya shehar try karo."
+                  message="Try a different name or city."
                 />
               ) : (
                 <div className="flex flex-col gap-6 lg:flex-row">
@@ -302,7 +302,7 @@ export default function ServiceBookingPage() {
                       />
                     ) : (
                       <div className="flex h-40 items-center justify-center rounded-2xl border border-border-main bg-surface-subtle px-6 text-center text-sm text-text-muted">
-                        In workshops ki map location abhi add nahi hui.
+                        Map locations have not been added for these workshops yet.
                       </div>
                     )}
                   </div>
