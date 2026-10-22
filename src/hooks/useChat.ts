@@ -30,7 +30,6 @@ export function useChat() {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
-  // NAYA LOGIC: useRef taake socket ko baar baar reconnect na hona pare
   const activeContactRef = useRef<UserContact | null>(null);
 
   useEffect(() => {
@@ -90,7 +89,6 @@ export function useChat() {
     fetchInitialData();
   }, []);
 
-  // SOCKET LOGIC: Ab yeh sirf 1 dafa chalega [] ki wajah se
   useEffect(() => {
     const socket = initSocket();
 
@@ -147,7 +145,7 @@ export function useChat() {
       socket.off("messageDelivered");
       disconnectSocket();
     };
-  }, []); // <-- Yahan se [activeContact] hata diya gaya hai
+  }, []);
 
   useEffect(() => {
     if (!activeContact) return;

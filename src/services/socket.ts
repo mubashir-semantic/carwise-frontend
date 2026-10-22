@@ -24,7 +24,6 @@ export const initSocket = (): Socket => {
   }
 
   socket = io(SOCKET_URL, {
-    // Function dene se har connect/reconnect par taaza token padha jata hai
     auth: (cb) => {
       const token =
         typeof window !== "undefined"

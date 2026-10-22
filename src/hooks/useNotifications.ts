@@ -46,7 +46,6 @@ export function useNotifications(limit = 10, pollMs = 30000) {
     }
   }, [limit]);
 
-  // Pehli baar load + har 30 second baad naya check
   useEffect(() => {
     const first = setTimeout(refresh, 0);
     const timer = setInterval(refresh, pollMs);
@@ -81,7 +80,6 @@ export function useNotifications(limit = 10, pollMs = 30000) {
       const target = items.find((n) => n._id === id);
       if (!target) return;
 
-      // Pehle screen se hata do (tez lagta hai), phir server se delete
       setItems((prev) => prev.filter((n) => n._id !== id));
       setTotal((t) => Math.max(0, t - 1));
       if (!target.isRead) setUnreadCount((c) => Math.max(0, c - 1));

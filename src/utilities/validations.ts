@@ -34,10 +34,9 @@ export const forgotPasswordSchema = z.object({
 
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
-// Reset Password Rules (Forgot Password Flow ke baad)
+// Reset Password Rules
 export const resetPasswordSchema = z
   .object({
-    // <-- YEH OTP KI NAYI FIELD ADD KI HAI -->
     otp: z
       .string()
       .length(6, "OTP must be exactly 6 digits")
