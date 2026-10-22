@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import api from "@/services/api";
 
-// Logged-in user ka apna avatar (photo ya naam ke initials, jaise SR)
 export function useMyAvatar() {
   const [avatar, setAvatar] = useState("");
 
